@@ -10,7 +10,6 @@ import AVFoundation
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
-      GMSServices.provideAPIKey("YOUR KEY HERE")
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     

@@ -4,6 +4,8 @@ import 'package:example/marker_info_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+const int numberOfMarkers = 20;
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -19,11 +21,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final Map<String, BitmapDescriptor> _originalIcons = {};
 
   // Starting and ending sizes for marker scaling
-  static const double widthStart = 35;
+  static const double widthStart = 42;
 
-  static const double heightStart = 35;
-  static const double widthEnd = 70; // scale 1.7
-  static const double heightEnd = 70; // scale 1.7
+  static const double heightStart = 48;
   /// Map to store animation controllers for each marker
   final Map<String,MarkerAnimationController>  _markerAnimationControllers = {};
   /// ValueNotifier for tracking the selected marker
@@ -36,6 +36,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late Future<void> _futureData;
   late List<LatLng> _randomLocations = [];
   final markerSheetController = MarkerSheetController();
+
+  static  const animationDuration = Duration(milliseconds: 300);
+  static const animationReverseDuration = Duration(microseconds: 400);
+
+  final List<String> markerAssets = [
+    'assets/map_marker_1.png',
+    'assets/map_marker_2.png',
+    'assets/map_marker_3.png',
+  ];
+
+  final Random _random = Random();
 
   @override
   void initState() {
@@ -51,10 +62,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     /// Initialize the controller
     final markerAnimationController = MarkerAnimationController(
         markerId: markerId,
-        startSize: Size(widthStart, heightStart),
-        endSize: Size(widthEnd, heightEnd),
+        minMarkerSize: Size(widthStart, heightStart),
+        scale: 1.7,
         assetPath: imagePath,
-        duration: const Duration(milliseconds: 500),
+        duration: animationDuration,
+        reverseDuration: animationReverseDuration,
+        curve: Curves.easeInOut,
+        reverseCurve: Curves.fastOutSlowIn,
         vsync: this
     );
 
@@ -90,16 +104,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   /// Function to initialize animation markers
   Future<void> initializeAnimationMarkers() async{
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numberOfMarkers; i++) {
       final markerId = 'marker_$i';
-      await _initializeAnimation('assets/map_marker.png', markerId);
+      final String randomAsset = markerAssets[_random.nextInt(markerAssets.length)];
+      await _initializeAnimation(randomAsset, markerId);
     }
   }
 
   /// Function to generate a list of random locations
   List<LatLng> generateRandomLocations() {
     List<LatLng> locations = [];
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numberOfMarkers; i++) {
       LatLng randomLocation = generateRandomLocation();
       locations.add(randomLocation);
     }
@@ -110,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   Set<Marker> _addRandomMarkers(List<LatLng> randomLocations) {
     final Set<Marker> markers = {};
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numberOfMarkers; i++) {
       final markerId = 'marker_$i';
       final markerHelper = MarkerHelper(
         onMarkerTapped: (String markerId) async {
@@ -164,26 +179,33 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                // }
             ),
             /// Draggable sheet to display additional content when a marker is tapped
-            ValueListenableBuilder(
-              valueListenable: _selectedMarkerId,
-              builder: (context, selectedMarkerId, _) {
-                return MarkerDraggableSheetPage(
-                    selectedMarkerId: selectedMarkerId,
-                    markerAnimationControllers:  _markerAnimationControllers,
-                    markerSheetController: markerSheetController,
-                  child: Column(
-                    children: [
-                      MarkerInfoCard(),
-                      MarkerInfoCard(),
-                      MarkerInfoCard(),
-                      MarkerInfoCard(),
-                      MarkerInfoCard(),
-                      MarkerInfoCard(),
-                    ],
-                  )
-                );
-              }
-            ),
+         MarkerDraggableSheetPage(
+             selectedMarkerIdNotifier: _selectedMarkerId,
+             markerAnimationControllers:  _markerAnimationControllers,
+             markerSheetController: markerSheetController,
+             config: MarkerDraggableSheetConfig(
+               showTopIndicator: false,
+               boxShadow: [
+                 BoxShadow(
+                   color: Colors.yellow,
+                   blurRadius: 10,
+                   spreadRadius: 1,
+                   offset: Offset(0, 1),
+                 ),
+               ],
+             ),
+
+             child: Column(
+               children: [
+                 MarkerInfoCard(),
+                 MarkerInfoCard(),
+                 MarkerInfoCard(),
+                 MarkerInfoCard(),
+                 MarkerInfoCard(),
+                 MarkerInfoCard(),
+               ],
+             )
+         ),
 
           ],
                ),

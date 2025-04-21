@@ -1,53 +1,75 @@
 import 'dart:async';
 
 import 'package:animate_map_markers/animate_map_markers.dart';
-import 'package:animate_map_markers/src/animation_extensions.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MarkerAnimationController {
+  /// The animation that controls the scaling size of the marker icon.
   late final Animation<Size> scaleAnimation;
+  /// A cache of pre-scaled marker icons mapped by a unique key.
   final Map<String, BitmapDescriptor> _scaledIcons = {};
+  /// A map of running animation controllers associated with their respective marker IDs.
   final Map<String, AnimationController> _runningAnimationControllers = {};
-  final Map<String, Animation<Size>> _scaleAnimations = {};
+
+  /// A map holding the current displayed icons for each marker.
   final Map<String, BitmapDescriptor> _currentIcons = {};
+
+  /// A map holding the original (unscaled) icons for each marker.
   final Map<String, BitmapDescriptor> _originalIcons = {};
-  // Stream controller to notify about icon changes
+
+  /// Stream controller that broadcasts updates when a marker's icon changes.
   final StreamController<BitmapDescriptor> _iconStreamController = StreamController<BitmapDescriptor>.broadcast();
+
+  /// A stream of updated marker icons for listening to icon changes.
   Stream<BitmapDescriptor> get iconStream => _iconStreamController.stream;
+  /// Stream controller that broadcasts the original marker icons.
   final StreamController<BitmapDescriptor> _originalIconStreamController = StreamController<BitmapDescriptor>.broadcast();
+
+  /// A stream of original marker icons for listening to unscaled icon updates.
   Stream<BitmapDescriptor> get originalIconStream => _originalIconStreamController.stream;
 
 
-  // Getter for accessing the _animationControllers map
+  /// Getter for accessing the _animationControllers map
   Map<String, AnimationController> get runningAnimationControllers => _runningAnimationControllers;
 
 
-  // Getter for accessing the originalIcons
+  /// Getter for accessing the originalIcons
 
   final MarkerScaler markerScaler;
 
 
   MarkerAnimationController({
     required this.markerId,
-    required this.startSize,
-    required this.endSize,
-    required this.assetPath,
-    //required this.animationController,
+    required this.minMarkerSize,
+    required this.scale,
+    this.assetPath,
+    this.iconMarker,
     required this.vsync,
     this.duration = const Duration(milliseconds: 500),
-    this.curve = Curves.fastOutSlowIn,
-    this.reverseCurve = Curves.easeInOut,
+    this.reverseDuration =  const Duration(milliseconds: 500),
+    this.curve = Curves.bounceOut,
+    this.reverseCurve = Curves.linear,
     MarkerScaler? scaler,
-  }): markerScaler = scaler ?? MarkerScaler();
+  }): markerScaler = scaler ?? MarkerScaler(assetPath: assetPath, icon: iconMarker);
 
+  /// Material icon that can be passed which can be used
+  /// in place of a default [Marker].
+  final Icon? iconMarker;
+
+
+  /// A unique identifier for the marker.
   final String markerId;
-  final Size startSize;
 
-  final Size endSize;
+  /// The base size of the marker before scaling.
+  final Size minMarkerSize;
 
-  final String assetPath;
+  /// The scale factor to be applied to [minMarkerSize] for the maximum size.
+  /// For example, a scale of 1.3 increases the size by 30%.
+  final double scale;
+
+  /// The asset path for the marker icon image.
+  final String? assetPath;
 
   /// The vsync of the animation.
   final TickerProvider vsync;
@@ -57,51 +79,70 @@ class MarkerAnimationController {
   /// Defaults to 500 milliseconds.
   final Duration duration;
 
+  /// The reverse duration of the animation.
+  ///
+  /// Defaults to 500 milliseconds.
+  final Duration reverseDuration;
+
   /// The curve of the animation.
   ///
-  /// Defaults to [Curves.fastOutSlowIn].
+  /// Defaults to [Curves.bounceOut].
   final Curve curve;
 
+
+  /// The reverse curve of the animation.
+  ///
+  /// Defaults to [Curves.linear].
   final Curve reverseCurve;
 
-  // Constructor expects a TickerProvider as vsync
+  /// Sets up the animation controller and scaling animation for a specific marker.
+  ///
+  /// - Initializes an [AnimationController] and a [CurvedAnimation] using the provided [vsync], [duration], [curve], and [reverseCurve].
+  /// - Creates a [Tween] that scales the marker's size during the animation.
+  /// - Preloads the original scaled icon and adds it to the stream controller.
+  /// - Listens to the animation progress and updates marker icons dynamically based on the current animation value.
   Future<void> setupAnimationController() async {
     // Now that the animationController is initialized, create the scaleAnimation
     final animationController = AnimationController(
         vsync: vsync, // Pass the TickerProvider to the AnimationController
         duration: duration,
+        reverseDuration: reverseDuration
     );
     final animation = CurvedAnimation(
       parent: animationController,
       curve: curve,
       reverseCurve: reverseCurve
-    ); /*.onEnd(() {
-      animationController.dispose();
-      _runningAnimationControllers.remove(markerId);
-    });*/
+    );
+
+    final Size scaledSize = Size(
+      minMarkerSize.width * scale,
+      minMarkerSize.height * scale,
+    );
 
     scaleAnimation = Tween<Size>(
-      begin: startSize,
-      end: endSize,
+      begin: minMarkerSize,
+      end: scaledSize,
     ).animate(
       animation
     );
 
     _runningAnimationControllers[markerId] = animationController;
-    _scaleAnimations[markerId] = scaleAnimation;
-    final originalIcon =  await markerScaler.scaleMarkerIcon(assetPath, startSize.width, startSize.height);
+
+     // final originalIcon =  await markerScaler.scaleMarkerIcon(assetPath, minMarkerSize.width, minMarkerSize.height);
+    final originalIcon  = await markerScaler.createBitmapDescriptor(minMarkerSize);
     _originalIcons[markerId] = originalIcon;
     _originalIconStreamController.add(_originalIcons[markerId]!);
 
 
     animationController.addListener(() async {
       final sizeFactor = scaleAnimation.value;
-      print("size Factor #### ${sizeFactor}");
       final width = sizeFactor.width;
       final height = sizeFactor.height;
       final key = '$assetPath w$width h $height';
       if (!_scaledIcons.containsKey(key)) {
-        final BitmapDescriptor icon = await markerScaler.scaleMarkerIcon(assetPath, width, height);
+       // final BitmapDescriptor icon = await markerScaler.scaleMarkerIcon(assetPath, width, height);
+        final BitmapDescriptor icon = await markerScaler.createBitmapDescriptor(Size(width, height));
+
 
           _scaledIcons[key] = icon;
           _currentIcons[markerId] = icon;
@@ -109,26 +150,26 @@ class MarkerAnimationController {
           _currentIcons [markerId] = _scaledIcons[key]!;
       }
       // Add the updated icon to the stream
-      print("current Icon marker Id ${_currentIcons[markerId]!} ${markerId}");
       _iconStreamController.add(_currentIcons[markerId]!);
     });
   }
 
   /// Animate marker by switching pre-generated icons
   Future<void> animateMarker(String markerId, bool selected) async {
-    print("111$_runningAnimationControllers");
     final animationController = _runningAnimationControllers[markerId];
-    print(animationController);
     if (animationController != null) {
       if (selected) {
         toggleAnimationDirection(animationController);
       } else {
-        resetAnimation(animationController);
         reverseAnimation(animationController);
       }
     }
   }
 
+  /// Toggles the direction of the given [AnimationController].
+  ///
+  /// - If the animation is completed or dismissed, it starts playing forward.
+  /// - If the animation is currently playing forward, it reverses the animation.
   void toggleAnimationDirection(AnimationController animationController) {
     if (animationController.status == AnimationStatus.dismissed ||
         animationController.status == AnimationStatus.completed) {
@@ -138,22 +179,19 @@ class MarkerAnimationController {
     }
   }
 
+  /// Reverses the animation controlled by the given [AnimationController].
   void reverseAnimation(AnimationController animationController) {
-    print('🔥 Reversing animation');
     animationController.reverse();
   }
 
-  void resetAnimation(AnimationController animationController) {
-        animationController.reset();
-    }
-
-  // Dispose of the controller when it's no longer needed
+  /// Dispose of the controller when it's no longer needed
   void dispose() {
-    // Stop running animations and dispose their controllers.
+    /// Stop running animations and dispose their controllers.
     stopAnimations();
     disposeStreamControllers();
   }
 
+  /// Closes the internal stream controllers used for emitting marker icons.
   void disposeStreamControllers() {
     if (!_originalIconStreamController.isClosed) {
       _originalIconStreamController.close();

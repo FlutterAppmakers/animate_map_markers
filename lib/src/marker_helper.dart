@@ -125,13 +125,11 @@ class MarkerHelper {
   /// Each marker’s animation is handled by its associated
   /// [MarkerAnimationController], which must be pre-registered in
   /// [markerAnimationController].
+  ///
   Future<void> selectMarker(String markerId) async {
-    for (var id in markerAnimationController.keys) {
-      if (id == markerId) {
-        await markerAnimationController[id]?.animateMarker(id, true);
-      } else {
-        await markerAnimationController[id]?.animateMarker(id, false);
-      }
+    for (final entry in markerAnimationController.entries) {
+      final isSelected = entry.key == markerId;
+      await entry.value.animateMarker(entry.key, isSelected);
     }
   }
 

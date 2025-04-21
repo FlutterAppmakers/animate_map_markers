@@ -29,8 +29,8 @@ void main() {
 
       controller = MarkerAnimationController(
         markerId: 'test_marker',
-        startSize: const Size(10, 10),
-        endSize: const Size(20, 20),
+        minMarkerSize: const Size(60, 60),
+        scale: 1.7,
         assetPath: 'assets/map_marker.png',
         vsync: tester,
         duration: const Duration(milliseconds: 100), // shorter duration

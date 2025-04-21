@@ -10,10 +10,10 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
 
     group('MarkerScaler', () {
-      test(
-          'should scale the marker icon and return a BitmapDescriptor', () async {
-        final icon = await MarkerScaler().scaleMarkerIcon(
-            'assets/map_marker.png', 60, 60);
+      testWidgets(
+          'should scale the marker icon and return a BitmapDescriptor', (tester) async {
+        final markerScaler = MarkerScaler(assetPath: 'assets/map_marker.png');
+        final icon = await  markerScaler.createBitmapDescriptor(Size(60.0, 60.0));
 
         expect(icon, isA<BitmapDescriptor>());
       });
@@ -26,6 +26,7 @@ void main() {
 
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheet(
+              config: const MarkerDraggableSheetConfig(),
               animateMarkers: () => triggered = true,
               markerSheetController: MarkerSheetController(),
               child: Text('Test'),
@@ -51,6 +52,7 @@ void main() {
 
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheet(
+              config: const MarkerDraggableSheetConfig(),
               animateMarkers: () => triggered = true,
               markerSheetController: MarkerSheetController(),
               child: Text('Test'),
@@ -74,9 +76,10 @@ void main() {
         testWidgets(
             'should show MarkerDraggableSheet when selectedMarkerId is not null', (
             tester) async {
+          final selectedMarkerIdNotifier = ValueNotifier<String?>(validMarkerId);
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheetPage(
-              selectedMarkerId: validMarkerId,
+              selectedMarkerIdNotifier: selectedMarkerIdNotifier,
               markerAnimationControllers: {},
               markerSheetController: MarkerSheetController(),
               child: Text('Content'),
@@ -90,9 +93,10 @@ void main() {
        testWidgets(
             'should not show MarkerDraggableSheet when selectedMarkerId is null', (
             tester) async {
+         final selectedMarkerIdNotifier = ValueNotifier<String?>(null);
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheetPage(
-              selectedMarkerId: null,
+              selectedMarkerIdNotifier: selectedMarkerIdNotifier,
               markerAnimationControllers: {},
               markerSheetController: MarkerSheetController(),
               child: Text('Content'),

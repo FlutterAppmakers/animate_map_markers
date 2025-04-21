@@ -4,10 +4,15 @@ allowing for a dynamic and engaging user experience. Additionally, it offers an 
 draggable sheet feature, where markers animate smoothly when the sheet expands and 
 reverse when collapsed"
 version: 0.0.1
-homepage:
+homepage: https://github.com/FlutterAppmakers/animate_map_markers
 repository: https://github.com/FlutterAppmakers/animate_map_markers
-issue_tracker:
+issue_tracker: https://github.com/FlutterAppmakers/animate_map_markers/issues
 screenshots:
+  - description: Animated markers
+    path: gifs/animated-markers.gif
+  - description: animated markers with draggable sheet
+    path: gifs/animated-markers-sheet.gif
+
 topics:
   -google_maps_flutter
   -map
@@ -15,7 +20,6 @@ topics:
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  #flutter: ">=1.17.0"
 
 dependencies:
   flutter:
@@ -24,6 +28,7 @@ dependencies:
   image: ^4.5.4
   sheet: ^1.0.0
   modal_bottom_sheet: ^3.0.0
+  flutter_svg: ^2.1.0
 
 
 dev_dependencies:
