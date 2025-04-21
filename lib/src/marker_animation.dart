@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:animate_map_markers/animate_map_markers.dart';
+import 'package:animate_map_markers/src/animation_extensions.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MarkerAnimationController {
-  late AnimationController animationController;
   late final Animation<Size> scaleAnimation;
   final Map<String, BitmapDescriptor> _scaledIcons = {};
-  final Map<String, AnimationController> _animationControllers = {};
+  final Map<String, AnimationController> _runningAnimationControllers = {};
   final Map<String, Animation<Size>> _scaleAnimations = {};
   final Map<String, BitmapDescriptor> _currentIcons = {};
   final Map<String, BitmapDescriptor> _originalIcons = {};
@@ -21,10 +21,12 @@ class MarkerAnimationController {
 
 
   // Getter for accessing the _animationControllers map
-  Map<String, AnimationController> get animationControllers => _animationControllers;
+  Map<String, AnimationController> get runningAnimationControllers => _runningAnimationControllers;
 
 
   // Getter for accessing the originalIcons
+
+  final MarkerScaler markerScaler;
 
 
   MarkerAnimationController({
@@ -36,7 +38,8 @@ class MarkerAnimationController {
     required this.vsync,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.fastOutSlowIn,
-  });
+    MarkerScaler? scaler,
+  }): markerScaler = scaler ?? MarkerScaler();
 
   final String markerId;
   final Size startSize;
@@ -61,25 +64,29 @@ class MarkerAnimationController {
   // Constructor expects a TickerProvider as vsync
   Future<void> animateTo() async {
     // Now that the animationController is initialized, create the scaleAnimation
-    animationController = AnimationController(
+    final animationController = AnimationController(
         vsync: vsync, // Pass the TickerProvider to the AnimationController
         duration: duration,
     );
+    final animation = CurvedAnimation(
+      parent: animationController, // Link the controller to the animation
+      curve: curve,         // Apply the curve to smooth the animation
+    ); /*.onEnd(() {
+      animationController.dispose();
+      _runningAnimationControllers.remove(markerId);
+    });*/
+
     scaleAnimation = Tween<Size>(
       begin: startSize, // Start size
       end: endSize,   // End size (scaled up)
     ).animate(
-      CurvedAnimation(
-        parent: animationController, // Link the controller to the animation
-        curve: curve,         // Apply the curve to smooth the animation
-      ),
+      animation
     );
 
-    _animationControllers[markerId] = animationController;
+    _runningAnimationControllers[markerId] = animationController;
     _scaleAnimations[markerId] = scaleAnimation;
-    // Define separate Tweens for width and height
-    //final originalIcon = await _generateScaledIcon(imagePath, Size(widthStart, heightStart));
-    final originalIcon =  await MarkerScaler.scaleMarkerIcon(assetPath, startSize.width, startSize.height);
+    //final markerScaler = MarkerScaler();
+    final originalIcon =  await markerScaler.scaleMarkerIcon(assetPath, startSize.width, startSize.height);
     _originalIcons[markerId] = originalIcon;
     _originalIconStreamController.add(_originalIcons[markerId]!);
 
@@ -91,7 +98,7 @@ class MarkerAnimationController {
       final height = sizeFactor.height;
       final key = '$assetPath w$width h $height';
       if (!_scaledIcons.containsKey(key)) {
-        final BitmapDescriptor icon = await MarkerScaler.scaleMarkerIcon(assetPath, width, height);
+        final BitmapDescriptor icon = await markerScaler.scaleMarkerIcon(assetPath, width, height);
 
           _scaledIcons[key] = icon;
           _currentIcons[markerId] = icon;
@@ -99,49 +106,68 @@ class MarkerAnimationController {
           _currentIcons [markerId] = _scaledIcons[key]!;
       }
       // Add the updated icon to the stream
+      print("current Icon marker Id ${_currentIcons[markerId]!} ${markerId}");
       _iconStreamController.add(_currentIcons[markerId]!);
     });
   }
 
   /// Animate marker by switching pre-generated icons
   Future<void> animateMarker(String markerId, bool selected) async {
-    print(_animationControllers);
-    final animationController = _animationControllers[markerId];
+    print("111$_runningAnimationControllers");
+    final animationController = _runningAnimationControllers[markerId];
     print(animationController);
     if (animationController != null) {
       if (selected) {
-
-        if (animationController.status == AnimationStatus.dismissed ||
-            animationController.status == AnimationStatus.completed) {
-          startAnimation();
-        } else  if (animationController.status == AnimationStatus.forward)  {
-          reverseAnimation();
-        }
+        toggleAnimationDirection(animationController);
       } else {
-        resetAnimation();
-        reverseAnimation();
+        resetAnimation(animationController);
+        reverseAnimation(animationController);
       }
     }
   }
 
-  // Start the animation (scale up)
-  void startAnimation() {
-    animationController.forward();
+  void toggleAnimationDirection(AnimationController animationController) {
+    if (animationController.status == AnimationStatus.dismissed ||
+        animationController.status == AnimationStatus.completed) {
+      animationController.forward();
+    } else  if (animationController.status == AnimationStatus.forward)  {
+      animationController.reverse();
+    }
   }
 
-  void resetAnimation() {
-    animationController.reset();
-  }
-
-  // Reverse the animation (scale down)
-  void reverseAnimation() {
+  void reverseAnimation(AnimationController animationController) {
+    print('🔥 Reversing animation');
     animationController.reverse();
   }
 
+  void resetAnimation(AnimationController animationController) {
+        animationController.reset();
+    }
+
   // Dispose of the controller when it's no longer needed
   void dispose() {
-    animationController.dispose();
+    // Stop running animations and dispose their controllers.
+    stopAnimations();
+    disposeStreamControllers();
   }
 
+  void disposeStreamControllers() {
+    if (!_originalIconStreamController.isClosed) {
+      _originalIconStreamController.close();
+    }
+
+    if (!_iconStreamController.isClosed) {
+      _iconStreamController.close();
+    }
+  }
+
+  /// Stop all ongoing animations.
+  void stopAnimations() {
+    for (final controller in _runningAnimationControllers.values) {
+      if (controller.isAnimating) controller.stop();
+      controller.dispose();
+    }
+    _runningAnimationControllers.clear();
+  }
   }
 

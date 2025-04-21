@@ -1,6 +1,5 @@
-import 'dart:async';
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// A utility class to scale local asset images for use as marker icons on
@@ -40,12 +39,15 @@ class MarkerScaler {
   /// Returns a [BitmapDescriptor] that can be used when creating a [Marker].
   ///
   /// Throws an [AssertionError] if the asset is missing or invalid.
-  static Future<BitmapDescriptor> scaleMarkerIcon(String assetPath,
-      double width, double height) async {
+
+  
+  Future<BitmapDescriptor> scaleMarkerIcon(
+      String assetPath, double width, double height) async {
     final icon = await BitmapDescriptor.asset(
-        ImageConfiguration(size: ui.Size(width, height)), assetPath);
+      ImageConfiguration(size: ui.Size(width, height)),
+      assetPath,
+    );
     return icon;
   }
 }
-
 

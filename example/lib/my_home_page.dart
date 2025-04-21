@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         startSize: Size(widthStart, heightStart),
         endSize: Size(widthEnd, heightEnd),
         assetPath: imagePath,
-        duration: const Duration(milliseconds: 120),
+        duration: const Duration(milliseconds: 500),
         vsync: this
     );
 
