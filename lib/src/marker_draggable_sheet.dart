@@ -105,7 +105,6 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
 
   void onChanged() {
     final currentSize = controller.size;
-    //print("currentSize ${currentSize}");
     if (currentSize <= widget.reverseAnimationSize) {
       widget.animateMarkers();
     }

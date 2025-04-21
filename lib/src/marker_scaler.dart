@@ -40,7 +40,7 @@ class MarkerScaler {
   ///
   /// Throws an [AssertionError] if the asset is missing or invalid.
 
-  
+
   Future<BitmapDescriptor> scaleMarkerIcon(
       String assetPath, double width, double height) async {
     final icon = await BitmapDescriptor.asset(

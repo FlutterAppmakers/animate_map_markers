@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:animate_map_markers/animate_map_markers.dart';
-import 'package:example/share_page.dart';
+import 'package:example/marker_info_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -13,37 +13,42 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late GoogleMapController mapController;
+  // Store current  marker icons for animations
   final Map<String, BitmapDescriptor> _currentIcons = {};
+  // Store original marker icons for animations
   final Map<String, BitmapDescriptor> _originalIcons = {};
+
+  // Starting and ending sizes for marker scaling
   static const double widthStart = 35;
 
   static const double heightStart = 35;
   static const double widthEnd = 70; // scale 1.7
   static const double heightEnd = 70; // scale 1.7
+  /// Map to store animation controllers for each marker
   final Map<String,MarkerAnimationController>  _markerAnimationControllers = {};
+  /// ValueNotifier for tracking the selected marker
   final ValueNotifier<
       String?> _selectedMarkerId = ValueNotifier<
       String?>(null);
 
-  // Define the center of Paris
+  /// Define the center of Paris
   final LatLng _parisCenter = LatLng(48.8566, 2.3522);
   late Future<void> _futureData;
   late List<LatLng> _randomLocations = [];
-
-  final controller = DraggableScrollableController();
   final markerSheetController = MarkerSheetController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    /// Initialize the markers with animations
     _futureData =   initializeAnimationMarkers();
     _randomLocations = generateRandomLocations();
   }
 
-  /// Initialize the animation controller with Bounce Out curve
+  /// Initialize the animation controller for each marker
   Future<void> _initializeAnimation(String imagePath, String markerId) async {
-    // Initialize the controller
+    /// Initialize the controller
     final markerAnimationController = MarkerAnimationController(
         markerId: markerId,
         startSize: Size(widthStart, heightStart),
@@ -56,27 +61,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     _markerAnimationControllers[markerId] = markerAnimationController;
 
 
-    // Listen to the stream and update the marker icon
+    /// Listen to the stream and update the marker icon
     markerAnimationController.iconStream.listen((updatedIcon) {
       setState(() {
-        print(123);
         _currentIcons[markerId]= updatedIcon;
       });
     });
 
+    /// Listen for the original icon and store it
     markerAnimationController.originalIconStream.listen((originalIcon) {
       setState(() {
-        print(456);
-        print(originalIcon);
         _originalIcons[markerId]= originalIcon;
       });
     });
 
     // Start the animation
-    markerAnimationController.animateTo();
+    markerAnimationController.setupAnimationController();
   }
 
-  // Function to generate random locations around Paris
+  /// Function to generate random locations around Paris
   LatLng generateRandomLocation() {
     final random = Random();
     // Latitude and Longitude ranges around Paris (within a small radius of Paris)
@@ -85,12 +88,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return LatLng(randomLat, randomLng);
   }
 
+  /// Function to initialize animation markers
   Future<void> initializeAnimationMarkers() async{
     for (int i = 0; i < 10; i++) {
       final markerId = 'marker_$i';
       await _initializeAnimation('assets/map_marker.png', markerId);
     }
   }
+
+  /// Function to generate a list of random locations
   List<LatLng> generateRandomLocations() {
     List<LatLng> locations = [];
     for (int i = 0; i < 10; i++) {
@@ -100,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return locations;
   }
 
-  // Function to add random markers on the map
+  /// Function to add random markers on the map
   Set<Marker> _addRandomMarkers(List<LatLng> randomLocations) {
     final Set<Marker> markers = {};
 
@@ -108,9 +114,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       final markerId = 'marker_$i';
       final markerHelper = MarkerHelper(
         onMarkerTapped: (String markerId) async {
-          print("Selected Marker Id is ### ${markerId}");
           _selectedMarkerId.value = markerId;
+          /// Trigger the sheet animation
           markerSheetController.animateSheet();
+
      },
         markerAnimationController: _markerAnimationControllers,
       );
@@ -129,7 +136,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print("rebuilddd ####");
        return Scaffold(
          body: Stack(
           children: [
@@ -157,6 +163,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
          
                // }
             ),
+            /// Draggable sheet to display additional content when a marker is tapped
             ValueListenableBuilder(
               valueListenable: _selectedMarkerId,
               builder: (context, selectedMarkerId, _) {
@@ -166,13 +173,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     markerSheetController: markerSheetController,
                   child: Column(
                     children: [
-                      SharePage(),
-                      SharePage(),
-                      SharePage(),
-                      SharePage(),
-                      SharePage(),
-                      SharePage(),
-                      SharePage(),
+                      MarkerInfoCard(),
+                      MarkerInfoCard(),
+                      MarkerInfoCard(),
+                      MarkerInfoCard(),
+                      MarkerInfoCard(),
+                      MarkerInfoCard(),
                     ],
                   )
                 );
@@ -185,11 +191,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   }
 
+  /// Stop all ongoing animations for markers.
+  void stopMarkerAnimations() {
+    for (int i = 0; i < 10; i++) {
+      final markerId = 'marker_$i';
+      final markerAnimationController = _markerAnimationControllers[markerId];
+      if(markerAnimationController != null) {
+        markerAnimationController.stopAnimations();
+      }
+    }
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
     _selectedMarkerId.dispose();
-    controller.dispose();
+    stopMarkerAnimations();
     super.dispose();
   }
 }

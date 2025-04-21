@@ -1,39 +1,163 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Animate Map Markers
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+Smooth scaling animations for Google Maps markers in Flutter.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+**`animate_map_markers`** is a performant Flutter package that brings your custom Google Maps markers to life with elegant scaling animations.
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+You can optionally connect it to a draggable bottom sheet:  
+When the sheet expands, markers animate smoothly. When it collapses, the animation reverses automatically.  
+Don’t need a sheet? No problem — you can trigger animations manually based on your app's logic.
 
-## Features
+### ✨ Why use it?
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Smooth scaling animation for map markers
+- Optional integration with draggable bottom sheets
+- Custom animation triggering via controller
+- Lightweight and easy to use
 
-## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+---
 
-## Usage
+#  Basics
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+---
+
+#  Syntax
+`animate_map_markers` revolves around managing animated map markers through a `MarkerAnimationController`. Here’s the basic usage:
+---
+
+## 1. Create a map of animation controllers
 
 ```dart
-const like = 'sample';
+final Map<String, MarkerAnimationController> _markerAnimationControllers = {};
 ```
 
-## Additional information
+## 2. Initialize the animation controller for each marker
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+
+```dart
+final animationController = MarkerAnimationController(
+  markerId: markerId,
+  startSize: const Size(35, 35),
+  endSize: const Size(70, 70), // 2x scale
+  assetPath: 'assets/your_image.png',
+  duration: const Duration(milliseconds: 500),
+  vsync: this, // your widget must use TickerProviderStateMixin
+);
+```
+
+
+## 3. Add to map ,listen to stream and setup marker animation controller
+
+Add the `MarkerAnimationController` to the map and listen to the stream and update the marker icon 
+and original icon:
+
+
+```dart
+///Add the `MarkerAnimationController` to the map
+_markerAnimationControllers[markerId] = animationController;
+
+/// Listen to the stream and update the marker icon
+markerAnimationController.iconStream.listen((updatedIcon) {
+setState(() {
+_currentIcons[markerId]= updatedIcon;
+});
+});
+
+/// Listen for the original icon and store it
+markerAnimationController.originalIconStream.listen((originalIcon) {
+setState(() {
+_originalIcons[markerId]= originalIcon;
+});
+});
+
+markerAnimationController.setupAnimationController();
+
+```
+
+## 4. Use animated icon in your marker
+
+```dart
+
+final markerHelper = MarkerHelper(
+markerAnimationController: _markerAnimationControllers,
+);
+
+final  marker =    markerHelper.createMarker(
+markerId:markerId,
+icon :  _currentIcons[markerId] ?? _originalIcons[markerId] ?? BitmapDescriptor.defaultMarker,
+position:  LatLng(48.8566, 2.3522),
+
+);
+```
+
+---
+
+#  Optional Integration with a Draggable Bottom Sheet
+
+You can optionally connect the animated markers to a draggable bottom sheet. When the bottom sheet expands, 
+the markers animate smoothly, scaling up based on the sheet's movement. Similarly, when the sheet collapses,
+the markers will reverse their animation, scaling back down. This integration enhances the user experience
+by adding an interactive and visually appealing element to your map. If you don’t need a draggable bottom sheet, 
+you can easily trigger the marker animations manually through your app's logic.
+
+### Setup controllers for interaction
+
+
+define a Controller to animate the draggable sheet and a ValueNotifier to keep track of the selected marker
+
+```dart
+final markerSheetController = MarkerSheetController();
+
+final ValueNotifier<
+    String?> _selectedMarkerId = ValueNotifier<
+    String?>(null);
+```
+#### Add Draggable sheet to display additional content when a marker is tapped
+```dart
+ValueListenableBuilder(
+valueListenable: _selectedMarkerId,
+builder: (context, selectedMarkerId, _) {
+return MarkerDraggableSheetPage(
+selectedMarkerId: selectedMarkerId,
+markerAnimationControllers:  _markerAnimationControllers,
+markerSheetController: markerSheetController,
+child:Column(
+children: [
+
+  //.... // Add your custom  widgets here
+
+],
+),  
+);
+}
+),
+```
+### Marker tap interaction
+
+To handle marker taps and trigger animations (like expanding a bottom sheet), pass an onMarkerTapped
+callback to the MarkerHelper, update the selected marker and trigger the sheet animation
+
+```dart
+final markerHelper = MarkerHelper(
+  onMarkerTapped: (String markerId) async {
+    // Update the selected marker
+    _selectedMarkerId.value = markerId;
+
+    // Trigger the sheet animation
+    markerSheetController.animateSheet();
+  },
+  markerAnimationController: _markerAnimationControllers,
+);
+```
+# Clean up in dispose
+
+Don't forget to stop all ongoing marker animations when your widget is disposed. This prevents memory leaks and ensures everything is properly cleaned up:
+
+```dart
+
+final markerAnimationController = _markerAnimationControllers[markerId];
+if (markerAnimationController != null) {
+  markerAnimationController.stopAnimations();
+}
+```

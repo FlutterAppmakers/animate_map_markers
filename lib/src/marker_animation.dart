@@ -38,6 +38,7 @@ class MarkerAnimationController {
     required this.vsync,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.fastOutSlowIn,
+    this.reverseCurve = Curves.easeInOut,
     MarkerScaler? scaler,
   }): markerScaler = scaler ?? MarkerScaler();
 
@@ -61,31 +62,33 @@ class MarkerAnimationController {
   /// Defaults to [Curves.fastOutSlowIn].
   final Curve curve;
 
+  final Curve reverseCurve;
+
   // Constructor expects a TickerProvider as vsync
-  Future<void> animateTo() async {
+  Future<void> setupAnimationController() async {
     // Now that the animationController is initialized, create the scaleAnimation
     final animationController = AnimationController(
         vsync: vsync, // Pass the TickerProvider to the AnimationController
         duration: duration,
     );
     final animation = CurvedAnimation(
-      parent: animationController, // Link the controller to the animation
-      curve: curve,         // Apply the curve to smooth the animation
+      parent: animationController,
+      curve: curve,
+      reverseCurve: reverseCurve
     ); /*.onEnd(() {
       animationController.dispose();
       _runningAnimationControllers.remove(markerId);
     });*/
 
     scaleAnimation = Tween<Size>(
-      begin: startSize, // Start size
-      end: endSize,   // End size (scaled up)
+      begin: startSize,
+      end: endSize,
     ).animate(
       animation
     );
 
     _runningAnimationControllers[markerId] = animationController;
     _scaleAnimations[markerId] = scaleAnimation;
-    //final markerScaler = MarkerScaler();
     final originalIcon =  await markerScaler.scaleMarkerIcon(assetPath, startSize.width, startSize.height);
     _originalIcons[markerId] = originalIcon;
     _originalIconStreamController.add(_originalIcons[markerId]!);

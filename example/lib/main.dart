@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animate_map_markers/animate_map_markers.dart';
-
-import 'home_page.dart';
 import 'my_home_page.dart';
 
 void main() {
