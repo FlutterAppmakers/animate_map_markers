@@ -26,10 +26,9 @@ void main() {
 
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheet(
-              config: const MarkerDraggableSheetConfig(),
+              config: const MarkerDraggableSheetConfig(child: Text('Test'),),
               animateMarkers: () => triggered = true,
               markerSheetController: MarkerSheetController(),
-              child: Text('Test'),
             ),
           ));
 
@@ -52,10 +51,9 @@ void main() {
 
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheet(
-              config: const MarkerDraggableSheetConfig(),
+              config: const MarkerDraggableSheetConfig(child: Text('Test'),),
               animateMarkers: () => triggered = true,
               markerSheetController: MarkerSheetController(),
-              child: Text('Test'),
             ),
           ));
 
@@ -76,13 +74,13 @@ void main() {
         testWidgets(
             'should show MarkerDraggableSheet when selectedMarkerId is not null', (
             tester) async {
-          final selectedMarkerIdNotifier = ValueNotifier<String?>(validMarkerId);
+          final selectedMarkerIdNotifier = ValueNotifier<MarkerId?>(MarkerId(validMarkerId));
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheetPage(
               selectedMarkerIdNotifier: selectedMarkerIdNotifier,
               markerAnimationControllers: {},
               markerSheetController: MarkerSheetController(),
-              child: Text('Content'),
+              config: MarkerDraggableSheetConfig(child: Text('Content')),
             ),
           ));
 
@@ -93,13 +91,13 @@ void main() {
        testWidgets(
             'should not show MarkerDraggableSheet when selectedMarkerId is null', (
             tester) async {
-         final selectedMarkerIdNotifier = ValueNotifier<String?>(null);
+         final selectedMarkerIdNotifier = ValueNotifier<MarkerId?>(null);
           await tester.pumpWidget(MaterialApp(
             home: MarkerDraggableSheetPage(
               selectedMarkerIdNotifier: selectedMarkerIdNotifier,
               markerAnimationControllers: {},
               markerSheetController: MarkerSheetController(),
-              child: Text('Content'),
+              config: MarkerDraggableSheetConfig(child: Text('Content')),
             ),
           ));
 

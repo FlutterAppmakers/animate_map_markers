@@ -28,7 +28,7 @@ void main() {
       when(mockMarkerScaler.scaleMarkerIcon(any, any, any)).thenAnswer((_) async => fakeIcon);
 
       controller = MarkerAnimationController(
-        markerId: 'test_marker',
+        markerId: MarkerId('test_marker'),
         minMarkerSize: const Size(60, 60),
         scale: 1.7,
         assetPath: 'assets/map_marker.png',
@@ -47,7 +47,7 @@ void main() {
       await controller.setupAnimationController();
 
       // 🔥 This actually starts the animation
-      await controller.animateMarker('test_marker', true);
+      await controller.animateMarker(MarkerId('test_marker'), true);
 
       // pump to start animation
       await tester.pump();

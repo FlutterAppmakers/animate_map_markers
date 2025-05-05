@@ -1,13 +1,11 @@
-import 'package:animate_map_markers/src/widgets/opacity_tween.dart';
+import 'package:animate_map_markers/src/opacity_tween.dart';
 import 'package:flutter/material.dart';
 import 'marker_draggable_sheet_config.dart';
 import 'marker_sheet_controller.dart';
 
 class MarkerDraggableSheet extends StatefulWidget {
-  /// The content widget to be displayed inside the [MarkerDraggableSheet].
-  final Widget child;
-  final void Function() animateMarkers;
 
+  final void Function() animateMarkers;
 
   /// The configuration object for customizing the behavior and appearance of the draggable sheet.
   ///
@@ -38,11 +36,8 @@ class MarkerDraggableSheet extends StatefulWidget {
   /// If null, the sheet will not respond to external control.
   final MarkerSheetController? markerSheetController;
 
-
-
   const  MarkerDraggableSheet({
     super.key,
-    required this.child,
     required this.animateMarkers,
     this.markerSheetController,
     required this.config
@@ -148,7 +143,7 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
 
 
                             SliverToBoxAdapter(
-                              child: widget.child,
+                              child: config.child,
                             ),
                           ],
                         ),

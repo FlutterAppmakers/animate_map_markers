@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../animate_map_markers.dart';
-import 'marker_sheet_controller.dart';
 
 /// A widget that wraps [MarkerDraggableSheet] and manages marker-specific animations.
 ///
@@ -13,15 +13,13 @@ class MarkerDraggableSheetPage extends StatelessWidget {
     required this.selectedMarkerIdNotifier,
     required this.markerAnimationControllers,
     required this.markerSheetController,
-    required this.child,
-    this.config = const MarkerDraggableSheetConfig(),
+    this.config = const MarkerDraggableSheetConfig(child: SizedBox()),
   });
-  /// The content widget to be displayed inside the [MarkerDraggableSheet].
-  final Widget child;
+
   /// A map of marker IDs to their corresponding [MarkerAnimationController]s.
   ///
   /// Used to control animation behavior of each individual marker.
-  final Map<String,MarkerAnimationController> markerAnimationControllers;
+  final Map<MarkerId,MarkerAnimationController> markerAnimationControllers;
   /// A controller for interacting with [MarkerDraggableSheet].
   final MarkerSheetController markerSheetController;
 
@@ -34,11 +32,11 @@ class MarkerDraggableSheetPage extends StatelessWidget {
   final MarkerDraggableSheetConfig config;
 
   /// The notifier for the currently selected marker ID.
-  final ValueNotifier<String?> selectedMarkerIdNotifier;
+  final ValueNotifier<MarkerId?> selectedMarkerIdNotifier;
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String?>(
+    return ValueListenableBuilder<MarkerId?>(
       valueListenable: selectedMarkerIdNotifier,
       builder: (context, selectedMarkerId, _) {
         if (selectedMarkerId == null) {
@@ -52,7 +50,6 @@ class MarkerDraggableSheetPage extends StatelessWidget {
             markerAnimationControllers[selectedMarkerId]
                 ?.animateMarker(selectedMarkerId, false);
           },
-          child: child,
         );
       },
     );

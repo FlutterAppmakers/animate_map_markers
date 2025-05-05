@@ -10,13 +10,13 @@ class MarkerAnimationController {
   /// A cache of pre-scaled marker icons mapped by a unique key.
   final Map<String, BitmapDescriptor> _scaledIcons = {};
   /// A map of running animation controllers associated with their respective marker IDs.
-  final Map<String, AnimationController> _runningAnimationControllers = {};
+  final Map<MarkerId, AnimationController> _runningAnimationControllers = {};
 
   /// A map holding the current displayed icons for each marker.
-  final Map<String, BitmapDescriptor> _currentIcons = {};
+  final Map<MarkerId, BitmapDescriptor> _currentIcons = {};
 
   /// A map holding the original (unscaled) icons for each marker.
-  final Map<String, BitmapDescriptor> _originalIcons = {};
+  final Map<MarkerId, BitmapDescriptor> _originalIcons = {};
 
   /// Stream controller that broadcasts updates when a marker's icon changes.
   final StreamController<BitmapDescriptor> _iconStreamController = StreamController<BitmapDescriptor>.broadcast();
@@ -31,7 +31,7 @@ class MarkerAnimationController {
 
 
   /// Getter for accessing the _animationControllers map
-  Map<String, AnimationController> get runningAnimationControllers => _runningAnimationControllers;
+  Map<MarkerId, AnimationController> get runningAnimationControllers => _runningAnimationControllers;
 
 
   /// Getter for accessing the originalIcons
@@ -59,7 +59,7 @@ class MarkerAnimationController {
 
 
   /// A unique identifier for the marker.
-  final String markerId;
+  final MarkerId markerId;
 
   /// The base size of the marker before scaling.
   final Size minMarkerSize;
@@ -140,9 +140,7 @@ class MarkerAnimationController {
       final height = sizeFactor.height;
       final key = '$assetPath w$width h $height';
       if (!_scaledIcons.containsKey(key)) {
-       // final BitmapDescriptor icon = await markerScaler.scaleMarkerIcon(assetPath, width, height);
         final BitmapDescriptor icon = await markerScaler.createBitmapDescriptor(Size(width, height));
-
 
           _scaledIcons[key] = icon;
           _currentIcons[markerId] = icon;
@@ -155,7 +153,7 @@ class MarkerAnimationController {
   }
 
   /// Animate marker by switching pre-generated icons
-  Future<void> animateMarker(String markerId, bool selected) async {
+  Future<void> animateMarker(MarkerId markerId, bool selected) async {
     final animationController = _runningAnimationControllers[markerId];
     if (animationController != null) {
       if (selected) {

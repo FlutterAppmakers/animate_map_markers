@@ -3,6 +3,15 @@ import 'package:flutter/material.dart';
 import '../../animate_map_markers.dart';
 
 class MarkerDraggableSheetConfig {
+
+  /// Whether the draggable sheet should be displayed on the screen.
+  ///
+  /// When set to `true`, a draggable sheet is shown above the map.
+  /// Defaults to `false`.
+  final bool isDraggableSheetVisible;
+
+  /// The content widget to be displayed inside the [MarkerDraggableSheet].
+  final Widget child;
   /// The initial fractional value of the parent container's height to use when displaying the widget
   ///
   /// Defaults to 0.5.
@@ -73,6 +82,8 @@ class MarkerDraggableSheetConfig {
   final double dynamicThreshold;
 
   const MarkerDraggableSheetConfig({
+    this.isDraggableSheetVisible = false,
+    required this.child,
     this.initialChildSize = 0.48,
     this.maxChildSize = 1.0,
     this.minChildSize = 0.0,

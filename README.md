@@ -16,8 +16,8 @@ Don’t need a sheet? No problem — you can trigger animations manually based o
 - Smooth scaling animation for map markers
 - Supports raster images, SVG assets, and Material Icons
 - Optional integration with draggable bottom sheets
-- Custom animation triggering via controller
 - Lightweight and easy to use
+
 ### Animated Map Markers
 
 | Animated Map Markers                                                                                                 |
@@ -107,212 +107,125 @@ import GoogleMaps
 ```
 
 # Syntax
+This guide will walk you through the steps to implement animated markers on Google Maps in Flutter using the AnimatedMapMarkersWidget.
+You can optionally integrate a draggable bottom sheet for added interactivity.
 
-`animate_map_markers` revolves around managing animated map markers through a
-`MarkerAnimationController`. Here’s the basic usage:
----
+## 1. Create your MarkerIconInfo list
+Each MarkerIconInfo represents a marker you want to animate on the map, including its position, 
+appearance, and scale animation.
 
-## 1. Create a map of animation controllers
+### Using an asset image (PNG, JPG, or SVG):
 
 ```dart
-
-final Map<String, MarkerAnimationController> _markerAnimationControllers = {};
+final markerIconsInfos = List.generate(7, (index) {
+  return MarkerIconInfo(
+    markerId: MarkerId('marker_$index'),
+    position: position,
+    assetPath: 'assets/map_marker.png', // or .svg
+    minMarkerSize: Size(42, 48),
+    scale: 1.7,
+  );
+});
 ```
 
-## 2. Initialize the animation controller for each marker
-You can initialize a MarkerAnimationController using either an asset image (raster or SVG) 
-or a Material Icon.
-
-## Using an asset image (PNG, JPG, or SVG):
-
+### Using a Material Icon:
 ```dart
+final markerIconsInfos = [
+  MarkerIconInfo.materialIcon(
+    markerId: MarkerId('marker_1'),
+    position: LatLng(48.8566, 2.3522),
+    icon: Icon(
+      Icons.location_on,
+      color: Colors.amber,
+      size: 100,
+      shadows: [
+        Shadow(
+          color: Colors.black.withOpacity(0.5),
+          offset: Offset(2, 2),
+          blurRadius: 4,
+        ),
+      ],
+    ),
+    minMarkerSize: Size(35, 35),
+    scale: 1.7,
+  ),
+];
 
-final animationController = MarkerAnimationController(
-  markerId: markerId,
-  minMarkerSize: Size(35, 35),
-  scale: 2.0, // 2x scale
-  assetPath: 'assets/your_image.png', // or .svg
-  duration: const Duration(milliseconds: 500),
-  vsync: this, // your widget must use TickerProviderStateMixin
+
+```
+## 2. Use AnimatedMapMarkersWidget in your widget tree
+
+This widget handles animated scaling for your markers
+```dart
+return AnimatedMapMarkersWidget(
+  defaultCameraLocation: LatLng(48.8566, 2.3522),
+  zoomLevel: 12,
+  scaledMarkerIconInfos: markerIconsInfos,
 );
 ```
 
+# (Optional) Show a draggable bottom sheet
 
-## Using a Material Icon:
-
+To show additional content when a marker is tapped, enable the draggable sheet by setting showDraggableSheet to true and providing a config:
 ```dart
-
-final animationController = MarkerAnimationController(
-  markerId: markerId,
-  minMarkerSize: Size(35, 35),
-  scale: 2.0, // 2x scale
-   iconMarker:Icon(
-       Icons.location_on, // Scale by specifying a larger size
-       color: Colors.amber,
-       size: 100,
-       shadows: [
-         Shadow(
-         color: Colors.black.withOpacity(0.5),
-         offset: Offset(2, 2),
-         blurRadius: 4,
-       ),
-  duration: const Duration(milliseconds: 500),
-  vsync: this, // your widget must use TickerProviderStateMixin
-);
-```
-
-## 3. Add to map ,listen to stream and setup marker animation controller
-
-Add the `MarkerAnimationController` to the map and listen to the stream and update the marker icon
-and original icon:
-
-```dart
-///Add the `MarkerAnimationController` to the map
-_markerAnimationControllers[markerId] = animationController;
-
-/// Listen to the stream and update the marker icon
-markerAnimationController.iconStream.listen(
-(updatedIcon) {
-  setState(() {
-    _currentIcons[markerId]= updatedIcon;
-  });
- },
-);
-
-/// Listen for the original icon and store it
-markerAnimationController.originalIconStream.listen(
-(originalIcon) {
-  setState(() {
-    _originalIcons[markerId]= originalIcon;
-   });
-  },
-);
-
-/// Setup the animation Controller
-markerAnimationController.setupAnimationController();
-
-```
-
-## 4. Use animated icon in your marker
-
-```dart
-
-final markerHelper = MarkerHelper(
-  markerAnimationController: _markerAnimationControllers,
-);
-
-final marker = markerHelper.createMarker(
-  markerId: markerId,
-  icon: _currentIcons[markerId] ?? _originalIcons[markerId] ?? BitmapDescriptor.defaultMarker,
-  position: LatLng(48.8566, 2.3522),
-
-);
-```
-
----
-
-# Optional Integration with a Draggable Bottom Sheet
-
-You can optionally connect the animated markers to a draggable bottom sheet. When the bottom sheet
-expands,
-the markers animate smoothly, scaling up based on the sheet's movement. Similarly, when the sheet
-collapses,
-the markers will reverse their animation, scaling back down. This integration enhances the user
-experience
-by adding an interactive and visually appealing element to your map. If you don’t need a draggable
-bottom sheet,
-you can easily trigger the marker animations manually through your app's logic.
-
-### Setup controllers for interaction
-
-define a Controller to animate the draggable sheet and a ValueNotifier to keep track of the selected
-marker
-
-```dart
-
-final markerSheetController = MarkerSheetController();
-
-final ValueNotifier<
-    String?> _selectedMarkerId = ValueNotifier<
-    String?>(null);
-```
-
-#### Add Draggable sheet to display additional content when a marker is tapped
-
-```dart
-  MarkerDraggableSheetPage(
-    selectedMarkerIdNotifier:: selectedMarkerId,
-    markerAnimationControllers: _markerAnimationControllers,
-    markerSheetController: markerSheetController,
-    child:Column(
-      children: [
-    
-      /// Add your custom  widgets here
-    
-        ],
+return AnimatedMapMarkersWidget(
+  defaultCameraLocation: LatLng(48.8566, 2.3522),
+  zoomLevel: 12,
+  scaledMarkerIconInfos: markerIconsInfos,
+  showDraggableSheet: true, // Optional, defaults to false
+  config: MarkerDraggableSheetConfig(
+    showTopIndicator: false,
+    boxShadow: [
+      BoxShadow(
+        color: Colors.yellow,
+        blurRadius: 10,
+        spreadRadius: 1,
+        offset: Offset(0, 1),
       ),
-    );
-  },
-),
-```
-### Marker tap interaction
-
-To handle marker taps and trigger animations (like expanding a bottom sheet), pass an onMarkerTapped
-callback to the MarkerHelper, update the selected marker and trigger the sheet animation
-
-```dart
-
-final markerHelper = MarkerHelper(
-  onMarkerTapped: (String markerId) async {
-    // Update the selected marker
-    _selectedMarkerId.value = markerId;
-
-    // Trigger the sheet animation
-    markerSheetController.animateSheet();
-  },
-  markerAnimationController: _markerAnimationControllers,
+    ],
+    child: Column(
+      children: List.generate(6, (_) => MarkerInfoCard()),
+    ),
+  ),
 );
-```
 
-# Clean up in dispose
-
-Don't forget to stop all ongoing marker animations when your widget is disposed. This prevents
-memory leaks and ensures everything is properly cleaned up:
-
-```dart
-
-final markerAnimationController = _markerAnimationControllers[markerId];
-if (markerAnimationController != null) {
-  markerAnimationController.stopAnimations();
-  }
 ```
 
 ### 🛠 Customize animation curves
 
 You can optionally customize the forward and reverse animation curves using the curve and
-reverseCurve parameters of MarkerAnimationController.
+reverseCurve parameters of MarkerIconInfo.
+You can also control animation timing using duration and reverseDuration.
 
 By default:
 
-curve is set to Curves.bounceOut
+- curve is set to Curves.bounceOut
 
-reverseCurve is set to Curves.linear
+- reverseCurve is set to Curves.linear
+
+- duration is set to Duration(milliseconds: 500),
+
+- reverseDuration is set to Duration(milliseconds: 500),
 
 These provide a playful scale-up and a neutral scale-down animation. You can change them to suit
 your app’s style.
 
 ```dart
+final markerIconsInfos = [
+  MarkerIconInfo(
+    markerId: MarkerId('marker_1'),
+    position: LatLng(48.8566, 2.3522),
+    assetPath: 'assets/your_image.svg',
+    minMarkerSize: Size(35, 35),
+    scale: 2.0,
+    duration: const Duration(milliseconds: 700),
+    reverseDuration: const Duration(milliseconds: 300),
+    curve: Curves.easeOutBack,
+    reverseCurve: Curves.easeInCubic,
+  ),
+];
 
-final animationController = MarkerAnimationController(
-  markerId: markerId,
-  minMarkerSize: Size(35, 35),
-  scale: 2.0,
-  assetPath: 'assets/your_image.png',
-  duration: const Duration(milliseconds: 500),
-  vsync: this,
-  curve: Curves.easeOutBack,
-  reverseCurve: Curves.easeInCubic,
-);
+
 ```
 
 ## Enjoy 
