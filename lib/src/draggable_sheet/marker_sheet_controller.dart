@@ -15,6 +15,7 @@ class MarkerSheetController {
   void bind(void Function() animateCallback) {
     _animateCallback = animateCallback;
   }
+
   /// Triggers the sheet to animate to its initial size.
   ///
   /// This will have no effect if the controller has not been bound yet,

@@ -19,7 +19,8 @@ class MarkerDraggableSheetPage extends StatelessWidget {
   /// A map of marker IDs to their corresponding [MarkerAnimationController]s.
   ///
   /// Used to control animation behavior of each individual marker.
-  final Map<MarkerId,MarkerAnimationController> markerAnimationControllers;
+  final Map<MarkerId, MarkerAnimationController> markerAnimationControllers;
+
   /// A controller for interacting with [MarkerDraggableSheet].
   final MarkerSheetController markerSheetController;
 

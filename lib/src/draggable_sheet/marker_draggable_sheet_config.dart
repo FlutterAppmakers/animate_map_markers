@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../animate_map_markers.dart';
 
 class MarkerDraggableSheetConfig {
-
   /// The content widget to be displayed inside the [MarkerDraggableSheet].
   final Widget child;
+
   /// The initial fractional value of the parent container's height to use when displaying the widget
   ///
   /// Defaults to 0.5.
@@ -75,20 +75,19 @@ class MarkerDraggableSheetConfig {
   ///
   final double dynamicThreshold;
 
-  const MarkerDraggableSheetConfig({
-    required this.child,
-    this.initialChildSize = 0.48,
-    this.maxChildSize = 1.0,
-    this.minChildSize = 0.0,
-    this.reverseAnimationSize = 0.1,
-    this.topCornerRadius = 22.0,
-    this.boxShadow,
-    this.topButtonIndicatorColor = Colors.black45,
-    this.curve = Curves.easeInOut,
-    this.duration = const Duration(milliseconds: 50),
-    this.showTopIndicator = true,
-    this.dynamicThreshold = 0.6,
-    this.topButtonIndicatorHeight = 5.0,
-    this.topButtonIndicatorWidth = 50.0
-  });
+  const MarkerDraggableSheetConfig(
+      {required this.child,
+      this.initialChildSize = 0.48,
+      this.maxChildSize = 1.0,
+      this.minChildSize = 0.0,
+      this.reverseAnimationSize = 0.1,
+      this.topCornerRadius = 22.0,
+      this.boxShadow,
+      this.topButtonIndicatorColor = Colors.black45,
+      this.curve = Curves.easeInOut,
+      this.duration = const Duration(milliseconds: 50),
+      this.showTopIndicator = true,
+      this.dynamicThreshold = 0.6,
+      this.topButtonIndicatorHeight = 5.0,
+      this.topButtonIndicatorWidth = 50.0});
 }

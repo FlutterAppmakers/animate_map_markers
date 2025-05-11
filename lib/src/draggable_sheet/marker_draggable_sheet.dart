@@ -4,7 +4,6 @@ import 'marker_draggable_sheet_config.dart';
 import 'marker_sheet_controller.dart';
 
 class MarkerDraggableSheet extends StatefulWidget {
-
   final void Function() animateMarkers;
 
   /// The configuration object for customizing the behavior and appearance of the draggable sheet.
@@ -36,13 +35,11 @@ class MarkerDraggableSheet extends StatefulWidget {
   /// If null, the sheet will not respond to external control.
   final MarkerSheetController? markerSheetController;
 
-  const  MarkerDraggableSheet({
-    super.key,
-    required this.animateMarkers,
-    this.markerSheetController,
-    required this.config
-  });
-
+  const MarkerDraggableSheet(
+      {super.key,
+      required this.animateMarkers,
+      this.markerSheetController,
+      required this.config});
 
   @override
   State<MarkerDraggableSheet> createState() => MarkerDraggableSheetState();
@@ -57,7 +54,8 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
   void initState() {
     super.initState();
     currentChildSizeNotifier.value = widget.config.initialChildSize;
-    widget.markerSheetController?.bind(animateMarkerSheet); // bind to your method
+    widget.markerSheetController
+        ?.bind(animateMarkerSheet); // bind to your method
     controller.addListener(onChanged);
   }
 
@@ -80,15 +78,12 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
   void hide() => animateSheet(getSheet.minChildSize);
 
   void animateSheet(double size) {
-    controller.animateTo(
-      size,
-      duration: widget.config.duration,
-     curve:  widget.config.curve
-    );
+    controller.animateTo(size,
+        duration: widget.config.duration, curve: widget.config.curve);
   }
 
   void animateMarkerSheet() {
-    if(controller.isAttached) {
+    if (controller.isAttached) {
       animateSheet(widget.config.initialChildSize);
     }
   }
@@ -110,7 +105,7 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
       return DraggableScrollableSheet(
         key: sheet,
         initialChildSize: config.initialChildSize,
-        maxChildSize:  config.maxChildSize,
+        maxChildSize: config.maxChildSize,
         minChildSize: config.minChildSize,
         expand: true,
         snap: true,
@@ -122,38 +117,33 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
         controller: controller,
         builder: (BuildContext context, ScrollController scrollController) {
           return ValueListenableBuilder<double>(
-            valueListenable: currentChildSizeNotifier,
-
-            builder: (context, currentSheetSize, _) {
-              return DecoratedBox(
-                decoration:  BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: config.boxShadow,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(config.topCornerRadius),
-                    topRight: Radius.circular(config.topCornerRadius),
+              valueListenable: currentChildSizeNotifier,
+              builder: (context, currentSheetSize, _) {
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: config.boxShadow,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(config.topCornerRadius),
+                      topRight: Radius.circular(config.topCornerRadius),
+                    ),
                   ),
-                ),
                   child: SafeArea(
                     top: currentSheetSize == config.maxChildSize,
-                        child: CustomScrollView(
-                          controller: scrollController,
-                          slivers: [
-                            topButtonIndicator(currentSheetSize: currentSheetSize),
-
-
-                            SliverToBoxAdapter(
-                              child: config.child,
-                            ),
-                          ],
+                    child: CustomScrollView(
+                      controller: scrollController,
+                      slivers: [
+                        topButtonIndicator(currentSheetSize: currentSheetSize),
+                        SliverToBoxAdapter(
+                          child: config.child,
                         ),
-                      ),
-                   // }
-                //  ),
-
-              );
-            }
-          );
+                      ],
+                    ),
+                  ),
+                  // }
+                  //  ),
+                );
+              });
         },
       );
     });
@@ -162,7 +152,8 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
   SliverToBoxAdapter topButtonIndicator({required double currentSheetSize}) {
     final config = widget.config;
     final shouldAnimate = !config.showTopIndicator;
-    final shouldShow = config.showTopIndicator || currentSheetSize < config.dynamicThreshold;
+    final shouldShow =
+        config.showTopIndicator || currentSheetSize < config.dynamicThreshold;
 
     final indicator = Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -193,11 +184,9 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
     }
 
     return SliverToBoxAdapter(
-      child: OpacityTween(
-          begin: shouldShow ? 0.0 : 1.0,
-          end: shouldShow ? 1.0 : 0.0,
-          child: indicator
-      )
-    );
+        child: OpacityTween(
+            begin: shouldShow ? 0.0 : 1.0,
+            end: shouldShow ? 1.0 : 0.0,
+            child: indicator));
   }
 }

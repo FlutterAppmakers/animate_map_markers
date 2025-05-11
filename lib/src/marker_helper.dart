@@ -15,7 +15,6 @@ class MarkerHelper {
   /// This is optional and will only be called if provided.
   final MarkerTapCallback? onMarkerTapped;
 
-
   /// A map of marker IDs to their associated animation controllers.
   ///
   /// Each [MarkerAnimationController] handles animation logic (e.g. scaling or
@@ -25,9 +24,7 @@ class MarkerHelper {
   ///
   final Map<MarkerId, MarkerAnimationController> markerAnimationController;
 
-
-  MarkerHelper(
-      {this.onMarkerTapped, required this.markerAnimationController});
+  MarkerHelper({this.onMarkerTapped, required this.markerAnimationController});
 
   /// Creates a [Marker] with full configuration and optional tap + drag callbacks.
   ///
@@ -61,33 +58,33 @@ class MarkerHelper {
   /// Returns a fully configured [Marker] with built-in tap handling.
   Marker createMarker({
     required MarkerIconInfo markerIconInfo,
-    BitmapDescriptor icon = BitmapDescriptor.defaultMarker, /// the scaled marker icon
-}
-      ) {
+    BitmapDescriptor icon = BitmapDescriptor.defaultMarker,
+
+    /// the scaled marker icon
+  }) {
     return Marker(
-      markerId: markerIconInfo.markerId,
-      position: markerIconInfo.position,
-      icon: icon,
-      infoWindow: markerIconInfo.infoWindow,
-      alpha: markerIconInfo.alpha,
-      anchor: markerIconInfo.anchor,
-      consumeTapEvents: markerIconInfo.consumeTapEvents,
-      draggable: markerIconInfo.draggable,
-      flat: markerIconInfo.flat,
-      rotation: markerIconInfo.rotation,
-      visible: markerIconInfo.visible,
-      zIndex: markerIconInfo.zIndex,
-      clusterManagerId: markerIconInfo.clusterManagerId,
-      onTap: () async {
-        if(onMarkerTapped != null) {
-         await  onMarkerTapped!(markerIconInfo.markerId);
-        }
-        await selectMarker(markerIconInfo.markerId);
-      },
-      onDrag: markerIconInfo.onDrag,
-      onDragStart: markerIconInfo.onDragStart,
-      onDragEnd: markerIconInfo.onDragEnd
-    );
+        markerId: markerIconInfo.markerId,
+        position: markerIconInfo.position,
+        icon: icon,
+        infoWindow: markerIconInfo.infoWindow,
+        alpha: markerIconInfo.alpha,
+        anchor: markerIconInfo.anchor,
+        consumeTapEvents: markerIconInfo.consumeTapEvents,
+        draggable: markerIconInfo.draggable,
+        flat: markerIconInfo.flat,
+        rotation: markerIconInfo.rotation,
+        visible: markerIconInfo.visible,
+        zIndex: markerIconInfo.zIndex,
+        clusterManagerId: markerIconInfo.clusterManagerId,
+        onTap: () async {
+          if (onMarkerTapped != null) {
+            await onMarkerTapped!(markerIconInfo.markerId);
+          }
+          await selectMarker(markerIconInfo.markerId);
+        },
+        onDrag: markerIconInfo.onDrag,
+        onDragStart: markerIconInfo.onDragStart,
+        onDragEnd: markerIconInfo.onDragEnd);
   }
 
   /// Selects a specific marker and deselects all others.

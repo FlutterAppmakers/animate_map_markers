@@ -3,10 +3,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// Class used to provide information about the marker on the [GoogleMap] widget.
 /// Pass either an asset image [assetPath] or a material [icon] to change the appearance of the icon.
-/// [assetMarkerSize] can be provided to resize image at [assetPath].
-///
-/// See also:
-///   * [bitmapDescriptor] parameter.
 class MarkerIconInfo {
   const MarkerIconInfo({
     required this.markerId,
@@ -16,7 +12,7 @@ class MarkerIconInfo {
     this.icon,
     this.assetPath,
     this.duration = const Duration(milliseconds: 500),
-    this.reverseDuration =  const Duration(milliseconds: 500),
+    this.reverseDuration = const Duration(milliseconds: 500),
     this.curve = Curves.bounceOut,
     this.reverseCurve = Curves.linear,
     // other marker params
@@ -26,7 +22,7 @@ class MarkerIconInfo {
     this.draggable = false,
     this.flat = false,
     this.infoWindow = InfoWindow.noText,
-    this.rotation =  0.0,
+    this.rotation = 0.0,
     this.visible = true,
     this.zIndex = 0.0,
     this.clusterManagerId,
@@ -35,12 +31,11 @@ class MarkerIconInfo {
     this.onDragEnd,
   });
 
-
   /// A unique identifier for the marker.
- final  MarkerId markerId;
+  final MarkerId markerId;
 
- /// Geographical location of the marker.
-  final  LatLng position;
+  /// Geographical location of the marker.
+  final LatLng position;
 
   /// Material icon that can be passed which can be used
   /// in place of a default [Marker].
@@ -49,7 +44,6 @@ class MarkerIconInfo {
   /// Asset image path that can be passed which can be used
   /// in place of a default [Marker].
   final String? assetPath;
-
 
   /// The base size of the marker before scaling.
   final Size minMarkerSize;
@@ -69,12 +63,10 @@ class MarkerIconInfo {
   /// Defaults to [Curves.bounceOut].
   final Curve curve;
 
-
   /// The reverse curve of the animation.
   ///
   /// Defaults to [Curves.linear].
   final Curve reverseCurve;
-
 
   /// The scale factor to be applied to [minMarkerSize] for the maximum size.
   /// For example, a scale of 1.3 increases the size by 30%.
@@ -94,7 +86,7 @@ class MarkerIconInfo {
   /// The image point is specified in normalized coordinates: An anchor of
   /// (0.0, 0.0) means the top left corner of the image. An anchor
   /// of (1.0, 1.0) means the bottom right corner of the image.
-  final  Offset anchor;
+  final Offset anchor;
 
   /// True if the marker icon consumes tap events. If not, the map will perform
   /// default tap handling by centering the map on the marker and displaying its

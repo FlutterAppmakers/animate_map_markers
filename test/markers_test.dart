@@ -1,9 +1,7 @@
-
 import 'dart:ui';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/annotations.dart';
-import 'package:animate_map_markers/animate_map_markers.dart';// ✅ This should point to MarkerScaler
-
+import 'package:animate_map_markers/animate_map_markers.dart'; // ✅ This should point to MarkerScaler
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -25,7 +23,8 @@ void main() {
       final fakeIcon = BitmapDescriptor.defaultMarker;
 
       // mock scaling to always return the fakeIcon
-      when(mockMarkerScaler.scaleMarkerIcon(any, any, any)).thenAnswer((_) async => fakeIcon);
+      when(mockMarkerScaler.scaleMarkerIcon(any, any, any))
+          .thenAnswer((_) async => fakeIcon);
 
       controller = MarkerAnimationController(
         markerId: MarkerId('test_marker'),

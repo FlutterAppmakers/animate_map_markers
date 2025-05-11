@@ -4,3 +4,8 @@
 - Adds smooth scaling animations to Google Maps markers.
 - Supports raster images, SVGs, and Material icons.
 - Optional integration with a draggable bottom sheet for coordinated motion.
+
+## 0.0.2
+
+- Updated README with improved documentation and usage examples.
+- Fixed screenshot and GIF URLs for better display on pub.dev.

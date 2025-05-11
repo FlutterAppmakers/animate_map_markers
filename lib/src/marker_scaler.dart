@@ -12,15 +12,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 /// using assets in your Flutter project.
 
 class MarkerScaler {
-
-  const MarkerScaler({
-    this.assetPath,
-    this.icon
-  });
+  const MarkerScaler({this.assetPath, this.icon});
 
   final String? assetPath;
   final Icon? icon;
-
 
   /// Creates a [BitmapDescriptor] that can be used as a Google Maps marker icon.
   ///
@@ -42,8 +37,7 @@ class MarkerScaler {
   Future<BitmapDescriptor> createBitmapDescriptor(Size size) async {
     if (assetPath != null) {
       if (assetPath!.isSvg) {
-        return svgToBitmapDescriptor(
-            assetName: assetPath!, size: size);
+        return svgToBitmapDescriptor(assetName: assetPath!, size: size);
       } else {
         return await assetImageToBitmapDescriptor(
           assetPath: assetPath!,
@@ -96,7 +90,9 @@ class MarkerScaler {
     return SizedBox(
       width: size.width,
       height: size.height,
-      child: SvgPicture.asset(assetName,),
+      child: SvgPicture.asset(
+        assetName,
+      ),
     ).toBitmapDescriptor();
   }
 

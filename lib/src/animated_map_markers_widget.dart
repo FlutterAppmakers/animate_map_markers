@@ -6,7 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../animate_map_markers.dart';
 
+/// A widget that displays a [GoogleMap] with animated, scalable markers.
+///
+/// The markers animate by scaling their size smoothly using custom icons. Optionally,
+/// a draggable sheet can appear below the map when a marker is tapped, showing additional information.
+
 class AnimatedMapMarkersWidget extends StatefulWidget {
+  /// Creates an [AnimatedMapMarkersWidget].
+  ///
+  /// The [defaultCameraLocation], [zoomLevel], and [scaledMarkerIconInfos] must not be null.
+  /// Optionally show a draggable sheet and pass additional [GoogleMap] parameters.
   const AnimatedMapMarkersWidget({
     super.key,
     required this.defaultCameraLocation,
@@ -45,7 +54,6 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
     this.onCameraIdle,
     this.onTap,
     this.onLongPress,
-
   });
 
   /// The initial location of the map's camera.
@@ -75,8 +83,10 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
   /// Set to `true` to show the sheet, or `false` to hide it. Defaults to `false`.
   final bool showDraggableSheet;
 
-/// scaled markers infos
-final List<MarkerIconInfo> scaledMarkerIconInfos;
+  /// The list of markers that will be animated using scaling effects.
+  ///
+  /// Each [MarkerIconInfo] provides configuration such as marker ID, asset path, scale, and animation settings.
+  final List<MarkerIconInfo> scaledMarkerIconInfos;
 
   /////////////////////////////////////////////////
   // OTHER GOOGLE MAPS PARAMS
@@ -189,7 +199,6 @@ final List<MarkerIconInfo> scaledMarkerIconInfos;
   /// Enables or disables the traffic layer of the map
   final bool trafficEnabled;
 
-
   /// Enables or disables showing 3D buildings where available
   final bool buildingsEnabled;
 
@@ -230,11 +239,12 @@ final List<MarkerIconInfo> scaledMarkerIconInfos;
   final ArgumentCallback<LatLng>? onLongPress;
 
   @override
-  State<AnimatedMapMarkersWidget> createState() => _AnimatedMapMarkersWidgetState();
+  State<AnimatedMapMarkersWidget> createState() =>
+      _AnimatedMapMarkersWidgetState();
 }
 
-class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> with TickerProviderStateMixin{
-
+class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
+    with TickerProviderStateMixin {
   final _mapsControllerCompleter = Completer<GoogleMapController>();
 
   Future<GoogleMapController> getGoogleMapsController() =>
@@ -244,55 +254,58 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
   final _markersMap = <MarkerId, Marker>{};
 
   /// Map to store animation controllers for each marker
-  final Map<MarkerId,MarkerAnimationController>  _markerAnimationControllers = {};
+  final Map<MarkerId, MarkerAnimationController> _markerAnimationControllers =
+      {};
 
   final markerSheetController = MarkerSheetController();
 
   late Future<void> _futureData;
 
   /// ValueNotifier for tracking the selected marker
-  final ValueNotifier<
-      MarkerId?> _selectedMarkerId = ValueNotifier<
-      MarkerId?>(null);
+  final ValueNotifier<MarkerId?> _selectedMarkerId =
+      ValueNotifier<MarkerId?>(null);
 
-  final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _currentIconsNotifier = ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
-  final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _originalIconsNotifier = ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
+  final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _currentIconsNotifier =
+      ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
+  final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _originalIconsNotifier =
+      ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _futureData =  _initializeAnimationMarkers();
+    _futureData = _initializeAnimationMarkers();
   }
 
   /// Initialize the animation controller for each marker
   Future<void> _initializeAnimation(MarkerIconInfo markerIconInfo) async {
     final markerId = markerIconInfo.markerId;
+
     /// Initialize the controller
     final markerAnimationController = MarkerAnimationController(
         markerId: markerId,
         minMarkerSize: markerIconInfo.minMarkerSize,
-        scale:markerIconInfo.scale,
+        scale: markerIconInfo.scale,
         assetPath: markerIconInfo.assetPath,
         iconMarker: markerIconInfo.icon,
         duration: markerIconInfo.duration,
         reverseDuration: markerIconInfo.reverseDuration,
         curve: markerIconInfo.curve,
         reverseCurve: markerIconInfo.reverseCurve,
-        vsync: this
-    );
+        vsync: this);
 
     _markerAnimationControllers[markerId] = markerAnimationController;
 
-
     /// Listen to the stream and update the marker icon
     markerAnimationController.iconStream.listen((updatedIcon) {
-      _currentIconsNotifier.value = Map.from(_currentIconsNotifier.value)..[markerId] = updatedIcon;
+      _currentIconsNotifier.value = Map.from(_currentIconsNotifier.value)
+        ..[markerId] = updatedIcon;
     });
 
     /// Listen for the original icon and store it
     markerAnimationController.originalIconStream.listen((originalIcon) {
-      _originalIconsNotifier.value = Map.from(_originalIconsNotifier.value)..[markerId] = originalIcon;
+      _originalIconsNotifier.value = Map.from(_originalIconsNotifier.value)
+        ..[markerId] = originalIcon;
     });
 
     /// Start the animation
@@ -300,35 +313,37 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
   }
 
   /// Function to initialize animation markers
-  Future<void> _initializeAnimationMarkers() async{
+  Future<void> _initializeAnimationMarkers() async {
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       await _initializeAnimation(markerInfo);
     }
   }
 
   /// setting source and destination markers
-  Future<void>_setScaledMarkers(Map<MarkerId, BitmapDescriptor> currentIcons, Map<MarkerId, BitmapDescriptor> originalIcons) async {
+  Future<void> _setScaledMarkers(Map<MarkerId, BitmapDescriptor> currentIcons,
+      Map<MarkerId, BitmapDescriptor> originalIcons) async {
     _markersMap.clear();
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       if (markerInfo.visible) {
         final markerHelper = MarkerHelper(
           onMarkerTapped: (MarkerId markerId) async {
             _selectedMarkerId.value = markerId;
+
             /// Trigger the sheet animation
             markerSheetController.animateSheet();
-
           },
           markerAnimationController: _markerAnimationControllers,
         );
 
-        final  marker =    markerHelper.createMarker(
+        final marker = markerHelper.createMarker(
           markerIconInfo: markerInfo,
-          icon :  currentIcons[markerInfo.markerId] ?? originalIcons[markerInfo.markerId] ?? BitmapDescriptor.defaultMarker,
+          icon: currentIcons[markerInfo.markerId] ??
+              originalIcons[markerInfo.markerId] ??
+              BitmapDescriptor.defaultMarker,
         );
 
         _markersMap[markerInfo.markerId] = marker;
       }
-
     }
   }
 
@@ -337,75 +352,76 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
     return Stack(
       children: [
         FutureBuilder<void>(
-          future: _futureData,
-          builder: (context, snap) {
-            final connectionWaiting = snap.connectionState == ConnectionState.waiting;
-            if (snap.hasError) {
-              return Center(child: Text('Error initializing markers: ${snap.error}'));
-            }
-            return ValueListenableBuilder<Map<MarkerId, BitmapDescriptor>>(
-              valueListenable: _currentIconsNotifier,
-              builder: (context, currentIcons, _) {
-                return ValueListenableBuilder<Map<MarkerId, BitmapDescriptor>>(
-                  valueListenable: _originalIconsNotifier,
-                  builder: (context, originalIcons, _) {
-                    if (!connectionWaiting) {
-                      // Only scale markers after data is ready
-                      _setScaledMarkers(currentIcons, originalIcons);
-                    }
-
-                    return GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                          target: widget.defaultCameraLocation,
-                        zoom: widget.zoomLevel
-                      ),
-                      markers: connectionWaiting
-                          ? widget.markers // fallback (no scaled markers yet)
-                          : {..._markersMap.values, ...widget.markers},
-                      style: widget.style,
-                      onMapCreated: (controller) {
-                        _mapsControllerCompleter.complete(controller);
-                        if (widget.onMapCreated != null) {
-                          return widget.onMapCreated!(controller);
-                        }
-                      },
-                      /////////////////////////////////////////////////
-                      // OTHER GOOGLE MAPS PARAMS
-                      /////////////////////////////////////////////////
-                      gestureRecognizers: widget.gestureRecognizers,
-                      compassEnabled: widget.compassEnabled,
-                      layoutDirection: widget.layoutDirection,
-                      mapToolbarEnabled: widget.mapToolbarEnabled,
-                      cameraTargetBounds: widget.cameraTargetBounds,
-                      mapType: widget.mapType,
-                      minMaxZoomPreference: widget.minMaxZoomPreference,
-                      rotateGesturesEnabled: widget.rotateGesturesEnabled,
-                      scrollGesturesEnabled: widget.scrollGesturesEnabled,
-                      zoomControlsEnabled: widget.zoomControlsEnabled,
-                      zoomGesturesEnabled: widget.zoomGesturesEnabled,
-                      liteModeEnabled: widget.liteModeEnabled,
-                      tiltGesturesEnabled: widget.tiltGesturesEnabled,
-                      myLocationEnabled: widget.myLocationEnabled,
-                      myLocationButtonEnabled: widget.myLocationButtonEnabled,
-                      padding: widget.padding,
-                      indoorViewEnabled: widget.indoorViewEnabled,
-                      trafficEnabled: widget.trafficEnabled,
-                      buildingsEnabled: widget.buildingsEnabled,
-                      polygons: widget.polygons,
-                      circles: widget.circles,
-                      onCameraMoveStarted: widget.onCameraMoveStarted,
-                      tileOverlays: widget.tileOverlays,
-                      onCameraMove: widget.onCameraMove,
-                      onCameraIdle: widget.onCameraIdle,
-                      onTap: widget.onTap,
-                      onLongPress: widget.onLongPress,
-                    );
-                  }
-                );
+            future: _futureData,
+            builder: (context, snap) {
+              final connectionWaiting =
+                  snap.connectionState == ConnectionState.waiting;
+              if (snap.hasError) {
+                return Center(
+                    child: Text('Error initializing markers: ${snap.error}'));
               }
-            );
-          }
-        ),
+              return ValueListenableBuilder<Map<MarkerId, BitmapDescriptor>>(
+                  valueListenable: _currentIconsNotifier,
+                  builder: (context, currentIcons, _) {
+                    return ValueListenableBuilder<
+                            Map<MarkerId, BitmapDescriptor>>(
+                        valueListenable: _originalIconsNotifier,
+                        builder: (context, originalIcons, _) {
+                          if (!connectionWaiting) {
+                            // Only scale markers after data is ready
+                            _setScaledMarkers(currentIcons, originalIcons);
+                          }
+
+                          return GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                                target: widget.defaultCameraLocation,
+                                zoom: widget.zoomLevel),
+                            markers: connectionWaiting
+                                ? widget
+                                    .markers // fallback (no scaled markers yet)
+                                : {..._markersMap.values, ...widget.markers},
+                            style: widget.style,
+                            onMapCreated: (controller) {
+                              _mapsControllerCompleter.complete(controller);
+                              if (widget.onMapCreated != null) {
+                                return widget.onMapCreated!(controller);
+                              }
+                            },
+                            /////////////////////////////////////////////////
+                            // OTHER GOOGLE MAPS PARAMS
+                            /////////////////////////////////////////////////
+                            gestureRecognizers: widget.gestureRecognizers,
+                            compassEnabled: widget.compassEnabled,
+                            layoutDirection: widget.layoutDirection,
+                            mapToolbarEnabled: widget.mapToolbarEnabled,
+                            cameraTargetBounds: widget.cameraTargetBounds,
+                            mapType: widget.mapType,
+                            minMaxZoomPreference: widget.minMaxZoomPreference,
+                            rotateGesturesEnabled: widget.rotateGesturesEnabled,
+                            scrollGesturesEnabled: widget.scrollGesturesEnabled,
+                            zoomControlsEnabled: widget.zoomControlsEnabled,
+                            zoomGesturesEnabled: widget.zoomGesturesEnabled,
+                            liteModeEnabled: widget.liteModeEnabled,
+                            tiltGesturesEnabled: widget.tiltGesturesEnabled,
+                            myLocationEnabled: widget.myLocationEnabled,
+                            myLocationButtonEnabled:
+                                widget.myLocationButtonEnabled,
+                            padding: widget.padding,
+                            indoorViewEnabled: widget.indoorViewEnabled,
+                            trafficEnabled: widget.trafficEnabled,
+                            buildingsEnabled: widget.buildingsEnabled,
+                            polygons: widget.polygons,
+                            circles: widget.circles,
+                            onCameraMoveStarted: widget.onCameraMoveStarted,
+                            tileOverlays: widget.tileOverlays,
+                            onCameraMove: widget.onCameraMove,
+                            onCameraIdle: widget.onCameraIdle,
+                            onTap: widget.onTap,
+                            onLongPress: widget.onLongPress,
+                          );
+                        });
+                  });
+            }),
 
         /// Draggable sheet to display additional content when a marker is tapped
         DraggableSheetWrapper(
@@ -413,9 +429,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
             selectedMarkerIdNotifier: _selectedMarkerId,
             markerAnimationControllers: _markerAnimationControllers,
             markerSheetController: markerSheetController,
-            config: widget.config
-        ),
-
+            config: widget.config),
       ],
     );
   }
@@ -425,7 +439,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       final markerId = markerInfo.markerId;
       final markerAnimationController = _markerAnimationControllers[markerId];
-      if(markerAnimationController != null) {
+      if (markerAnimationController != null) {
         markerAnimationController.stopAnimations();
       }
     }
@@ -435,7 +449,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
   void dispose() {
     if (_mapsControllerCompleter.isCompleted) {
       _mapsControllerCompleter.future.then(
-            (controller) => controller.dispose(),
+        (controller) => controller.dispose(),
       );
     }
 
@@ -445,5 +459,4 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget> wit
     _originalIconsNotifier.dispose();
     super.dispose();
   }
-
 }

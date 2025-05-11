@@ -22,13 +22,13 @@ Don’t need a sheet? No problem — you can trigger animations manually based o
 
 | Animated Map Markers                                                                                                 |
 |----------------------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/FlutterAppmakers/animate_map_markers/blob/main/gifs/animated-markers.gif" width= "350"> |
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/animated-markers.gif" width= "350"> |
 
 ### Animated Map Markers with Draggable Sheet
 
 | Animated Map Markers With Draggable Sheet                                                                                 |
 |---------------------------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/FlutterAppmakers/animate_map_markers/blob/main/gifs/animated-markers-sheet.gif" width="350"> |
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/animated-markers-sheet.gif" width="350"> |
 
 
 ## Getting Started
@@ -232,17 +232,17 @@ final markerIconsInfos = [
 
 | Animated Map Markers with Raster Image Support                                                                        |
 |-----------------------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/FlutterAppmakers/animate_map_markers/blob/main/gifs/screenshot_raster.png" width= "350"> |
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/screenshot_raster.png" width= "350"> |
 
 
-| Animated Map Markers  with SVG support                                                                             |
-|--------------------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/FlutterAppmakers/animate_map_markers/blob/main/gifs/screenshot_svg.png" width= "350"> |
+| Animated Map Markers  with SVG support                                                                                      |
+|-----------------------------------------------------------------------------------------------------------------------------|
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/screenshot_svg.png" width= "350"> |
 
 
-| Animated Map Markers with Icon Support                                                                                          |
+| Animated Map Markers with Icon Support                                                                                        |
 |---------------------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/FlutterAppmakers/animate_map_markers/blob/main/gifs/screenshot_icon.png" width= "350"> |
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/screenshot_icon.png" width= "350"> |
 
 ## Contributors
 

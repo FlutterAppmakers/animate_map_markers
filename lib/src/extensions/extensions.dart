@@ -6,19 +6,30 @@ import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 extension ToBitDescription on Widget {
+  /// Converts a widget to a [BitmapDescriptor] that can be used with Google Maps markers.
+  ///
+  /// This method renders the current widget into an image and converts it into a [BitmapDescriptor].
+  /// It uses a [RepaintBoundary] and off-screen rendering techniques to capture the widget accurately.
+  ///
+  /// Parameters:
+  /// - [logicalSize] defines the logical size of the widget to be rendered. It affects layout.
+  /// - [imageSize] defines the pixel size of the resulting image. Useful for fine control over resolution.
+  /// - [waitToRender] allows a short delay before rendering to ensure all assets (like fonts/images) are ready.
+  /// - [textDirection] sets the directionality of the widget (LTR or RTL). Defaults to [TextDirection.ltr].
+  ///
+  /// Returns:
+  /// - A [Future] that completes with a [BitmapDescriptor] that can be used in Google Maps.
   Future<BitmapDescriptor> toBitmapDescriptor(
       {Size? logicalSize,
-        Size? imageSize,
-        Duration waitToRender = const Duration(milliseconds: 10),
-        TextDirection textDirection = TextDirection.ltr}) async {
-
+      Size? imageSize,
+      Duration waitToRender = const Duration(milliseconds: 10),
+      TextDirection textDirection = TextDirection.ltr}) async {
     /// tells Flutter: "only render this subtree" — it helps isolate this widget so it can be rendered into an image.
     final widget = RepaintBoundary(
       child: MediaQuery(
           data: const MediaQueryData(),
           child: Directionality(textDirection: TextDirection.ltr, child: this)),
     );
-
 
     ///Gets the current screen/view. Required to build a render tree that matches your device resolution.
     final view = ui.PlatformDispatcher.instance.views.first;
@@ -43,9 +54,9 @@ extension ToBitDescription on Widget {
 
 Future<Uint8List> createImageFromWidget(Widget widget,
     {Size? logicalSize,
-     required Duration waitToRender,
-      required ui.FlutterView view,
-      Size? imageSize}) async {
+    required Duration waitToRender,
+    required ui.FlutterView view,
+    Size? imageSize}) async {
   final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
   logicalSize ??= view.physicalSize / view.devicePixelRatio;
   imageSize ??= view.physicalSize;
@@ -58,7 +69,7 @@ Future<Uint8List> createImageFromWidget(Widget widget,
         alignment: Alignment.center, child: repaintBoundary),
     configuration: ViewConfiguration(
       physicalConstraints:
-      BoxConstraints.tight(logicalSize) * view.devicePixelRatio,
+          BoxConstraints.tight(logicalSize) * view.devicePixelRatio,
       logicalConstraints: BoxConstraints.tight(logicalSize),
       devicePixelRatio: view.devicePixelRatio,
     ),
@@ -71,7 +82,7 @@ Future<Uint8List> createImageFromWidget(Widget widget,
   renderView.prepareInitialFrame();
 
   final RenderObjectToWidgetElement<RenderBox> rootElement =
-  RenderObjectToWidgetAdapter<RenderBox>(
+      RenderObjectToWidgetAdapter<RenderBox>(
     container: repaintBoundary,
     child: widget,
   ).attachToRenderTree(buildOwner);
@@ -79,11 +90,10 @@ Future<Uint8List> createImageFromWidget(Widget widget,
   buildOwner.buildScope(rootElement);
 
   /// Adds a brief delay to allow layout and async content (e.g. images) to begin loading.
-    await Future.delayed(waitToRender);
+  await Future.delayed(waitToRender);
 
   /// Waits until the end of the current frame to ensure rendering has completed.
-    await WidgetsBinding.instance.endOfFrame;
-
+  await WidgetsBinding.instance.endOfFrame;
 
   buildOwner.buildScope(rootElement);
   buildOwner.finalizeTree();
@@ -95,11 +105,10 @@ Future<Uint8List> createImageFromWidget(Widget widget,
   final ui.Image image = await repaintBoundary.toImage(
       pixelRatio: imageSize.width / logicalSize.width);
   final ByteData? byteData =
-  await image.toByteData(format: ui.ImageByteFormat.png);
+      await image.toByteData(format: ui.ImageByteFormat.png);
 
   return byteData!.buffer.asUint8List();
 }
-
 
 /// Extension on [String] to check if an asset path refers to an SVG file.
 extension SvgAssetCheck on String {
