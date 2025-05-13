@@ -9,3 +9,8 @@
 
 - Updated README with improved documentation and usage examples.
 - Fixed screenshot and GIF URLs for better display on pub.dev.
+
+## 0.0.3
+
+- Updated README with clearer usage instructions and formatting improvements.
+- Fixed a `RenderFlex overflow` issue in the example app's marker animation layout.

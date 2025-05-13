@@ -166,28 +166,30 @@ class MarkerInfoCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Container(
-                        color: Colors.black12,
-                        height: 20,
-                        width: 240,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Container(
+                          color: Colors.black12,
+                          height: 20,
+                          width: 240,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 5),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Container(
-                        color: Colors.black12,
-                        height: 20,
-                        width: 180,
+                      SizedBox(height: 5),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Container(
+                          color: Colors.black12,
+                          height: 20,
+                          width: 180,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 50),
-                  ],
+                      SizedBox(height: 50),
+                    ],
+                  ),
                 )
               ],
             ),
