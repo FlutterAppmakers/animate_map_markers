@@ -1,22 +1,36 @@
 # Animate Map Markers
 
-Smooth scaling animations for Google Maps markers in Flutter.
+Animation utility for the google_maps_flutter package.
 
-**`animate_map_markers`** is a performant Flutter package that brings your custom Google Maps
-markers to life with elegant scaling animations — whether your markers are built 
-from raster images, SVGs, or Material Icons.
+animate_map_markers is a flexible and performant Flutter package that brings your Google Maps markers to life with 
+smooth scaling animations
+— whether they’re built from raster images, SVGs, or Material Icons.
 
-You can optionally connect it to a draggable bottom sheet:  
-When the sheet expands, markers animate smoothly. When it collapses, the animation reverses
-automatically.  
-Don’t need a sheet? No problem — you can trigger animations manually based on your app's logic.
+✨ Features:
+- Smooth, customizable scaling animations for Google Maps markers.
 
-### ✨ Why use it?
+- Optional integration with a draggable bottom sheet: When the sheet expands, markers animate. When the sheet collapses, 
+animations reverse automatically.
 
-- Smooth scaling animation for map markers
-- Supports raster images, SVG assets, and Material Icons
-- Optional integration with draggable bottom sheets
+- Built-in support for a carousel-style card slider synced with markers. Display interactive information
+ (like restaurant details, place cards, etc.) under the map. Automatically syncs the selected card with the 
+active marker on the map.
+
+✨ Why use it?
+- Bring your map to life with smooth and natural marker animations.
+
+- Works with any marker style — raster images, SVGs, or Material Icons.
+
+- Seamless UI integration with optional carousel sliders or draggable bottom sheets.
+
 - Lightweight and easy to use
+
+### Animated Map Markers with Carousel Slider
+
+
+| Animated Map Markers with Carousel Slider                                                                                       |
+|---------------------------------------------------------------------------------------------------------------------------------|
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/animated-markers-carousel.gif" height= "400"> |
 
 ### Animated Map Markers
 
@@ -163,16 +177,42 @@ return AnimatedMapMarkersWidget(
 );
 ```
 
-## (Optional) Show a draggable bottom sheet
+## Show a carousel of marker-related content
 
-To show additional content when a marker is tapped, enable the draggable sheet by setting showDraggableSheet to true and providing a config:
+To display a swipeable carousel linked to map markers, provide a MarkerSwipeCardConfig to the overlayContent parameter:
+
 ```dart
 return AnimatedMapMarkersWidget(
   defaultCameraLocation: LatLng(48.8566, 2.3522),
   zoomLevel: 12,
   scaledMarkerIconInfos: markerIconsInfos,
-  showDraggableSheet: true, // Optional, defaults to false
-  config: MarkerDraggableSheetConfig(
+  overlayContent:MarkerSwipeCardConfig(
+   bottom: 30,
+ /// Provide a list of widgets to display in the carousel (e.g. restaurant cards)
+  items: restaurantCards,
+   options: MarkerSwipeCardOption(
+   height: 270,
+   enlargeCenterPage: true,
+   onPageChanged: (index, reason) {
+   /// perform additional actions when the carousel page changes
+   },
+  ),
+ ),
+);
+
+
+```
+
+## Show a draggable bottom sheet
+
+To display a draggable bottom sheet  when a marker is tapped, provide a MarkerDraggableSheetConfig to the overlayContent parameter:
+
+```dart
+return AnimatedMapMarkersWidget(
+  defaultCameraLocation: LatLng(48.8566, 2.3522),
+  zoomLevel: 12,
+  scaledMarkerIconInfos: markerIconsInfos,
+  overlayContent: MarkerDraggableSheetConfig(
     showTopIndicator: false,
     boxShadow: [
       BoxShadow(
@@ -224,11 +264,7 @@ final markerIconsInfos = [
   ),
 ];
 
-
 ```
-
-## Enjoy 
-
 
 | Animated Map Markers with Raster Image Support                                                                                   |
 |----------------------------------------------------------------------------------------------------------------------------------|

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:animate_map_markers/src/draggable_sheet/draggable_sheet_wrapper.dart';
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +23,7 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
     this.style,
     this.onMapCreated,
     required this.scaledMarkerIconInfos,
-    this.showDraggableSheet = false,
-    this.config = const MarkerDraggableSheetConfig(child: SizedBox()),
+    this.overlayContent,
     // other google maps params
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
     this.compassEnabled = true,
@@ -71,17 +70,20 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
   /// Markers to be placed on the map. (apart from animated map markers).
   final Set<Marker> markers;
 
-  /// The configuration object for customizing the behavior and appearance of the draggable sheet.
+  /// Provides custom overlay content to display above the map, such as a
+  /// draggable bottom sheet or a horizontal swipeable card view (PageView).
   ///
-  /// Provides properties such as `initialChildSize`, `maxChildSize`, `curve`, `duration`,
-  /// and more to control how the sheet behaves and looks.
+  /// Use this property to define how additional marker-related UI should be
+  /// presented. It accepts subclasses of [MarkerOverlayContent], such as:
   ///
-  /// Defaults are defined within [MarkerDraggableSheetConfig].
-  final MarkerDraggableSheetConfig config;
+  /// - [MarkerDraggableSheetConfig]: displays a draggable bottom sheet
+  ///   containing marker information.
+  /// - [MarkerSwipeCardConfig]: displays a swipeable horizontal card layout
+  ///   that syncs with markers on the map.
+  ///
+  /// If `overlayContent` is `null`, no overlay will be shown.
 
-  /// Controls whether the draggable marker info sheet is shown below the map.
-  /// Set to `true` to show the sheet, or `false` to hide it. Defaults to `false`.
-  final bool showDraggableSheet;
+  final MarkerOverlayContent? overlayContent;
 
   /// The list of markers that will be animated using scaling effects.
   ///
@@ -270,6 +272,10 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _originalIconsNotifier =
       ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
 
+  final ValueNotifier<bool> isPageAnimatingFromMarker = ValueNotifier(false);
+  final CarouselSliderController carouselSliderController =
+      CarouselSliderController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -326,24 +332,50 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       if (markerInfo.visible) {
         final markerHelper = MarkerHelper(
-          onMarkerTapped: (MarkerId markerId) async {
-            _selectedMarkerId.value = markerId;
-
-            /// Trigger the sheet animation
-            markerSheetController.animateSheet();
-          },
+          onMarkerTapped: (MarkerId markerId) async =>
+              _handleMarkerTap(markerId),
           markerAnimationController: _markerAnimationControllers,
         );
 
+        final icon = currentIcons[markerInfo.markerId] ??
+            originalIcons[markerInfo.markerId] ??
+            BitmapDescriptor.defaultMarker;
+
         final marker = markerHelper.createMarker(
           markerIconInfo: markerInfo,
-          icon: currentIcons[markerInfo.markerId] ??
-              originalIcons[markerInfo.markerId] ??
-              BitmapDescriptor.defaultMarker,
+          icon: icon,
         );
 
         _markersMap[markerInfo.markerId] = marker;
       }
+    }
+  }
+
+  void _handleMarkerTap(MarkerId markerId) {
+    _selectedMarkerId.value = markerId;
+
+    isPageAnimatingFromMarker.value = true;
+
+    switch (widget.overlayContent) {
+      case MarkerDraggableSheetConfig():
+
+        /// Trigger the sheet animation
+        markerSheetController.animateSheet();
+        break;
+
+      case MarkerSwipeCardConfig():
+        final index = widget.scaledMarkerIconInfos
+            .indexWhere((info) => info.markerId == markerId);
+
+        final indexPage = (index == -1) ? 0 : index;
+
+        /// jump to Marker swipe card index
+        carouselSliderController.animateToPage(indexPage);
+        break;
+      default:
+
+        /// no action
+        break;
     }
   }
 
@@ -422,14 +454,26 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
                         });
                   });
             }),
+        if (widget.overlayContent is MarkerDraggableSheetConfig)
 
-        /// Draggable sheet to display additional content when a marker is tapped
-        DraggableSheetWrapper(
-            showDraggableSheet: widget.showDraggableSheet,
+          /// Draggable sheet to display additional content when a marker is tapped
+          MarkerDraggableSheetPage(
+              selectedMarkerIdNotifier: _selectedMarkerId,
+              markerAnimationControllers: _markerAnimationControllers,
+              markerSheetController: markerSheetController,
+              config: widget.overlayContent as MarkerDraggableSheetConfig)
+        else if (widget.overlayContent is MarkerSwipeCardConfig)
+          MarkerSwipeCard(
             selectedMarkerIdNotifier: _selectedMarkerId,
             markerAnimationControllers: _markerAnimationControllers,
-            markerSheetController: markerSheetController,
-            config: widget.config),
+            config: widget.overlayContent as MarkerSwipeCardConfig,
+            scaledMarkerIconInfos: widget.scaledMarkerIconInfos,
+            mapControllerCompleter: _mapsControllerCompleter,
+            isPageAnimatingFromMarker: isPageAnimatingFromMarker,
+            controller: carouselSliderController,
+          )
+        else
+          SizedBox.shrink()
       ],
     );
   }
@@ -457,6 +501,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     _selectedMarkerId.dispose();
     _currentIconsNotifier.dispose();
     _originalIconsNotifier.dispose();
+    isPageAnimatingFromMarker.dispose();
     super.dispose();
   }
 }

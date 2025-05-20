@@ -14,3 +14,7 @@
 
 - Updated README with clearer usage instructions and formatting improvements.
 - Fixed a `RenderFlex overflow` issue in the example app's marker animation layout.
+
+## 0.0.4
+- Added support for animating markers in sync with a carousel slider.
+- Improved example app to demonstrate marker animations linked to carousel item selection.
