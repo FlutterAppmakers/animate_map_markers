@@ -120,8 +120,7 @@ class _HomePageState extends State<HomePage> {
             defaultCameraLocation: _parisCenter,
             zoomLevel: 12,
             scaledMarkerIconInfos: markerIconsInfos,
-            showDraggableSheet: true,
-            config: MarkerDraggableSheetConfig(
+            overlayContent: MarkerDraggableSheetConfig(
               showTopIndicator: false,
               boxShadow: [
                 BoxShadow(

@@ -171,8 +171,7 @@ return AnimatedMapMarkersWidget(
   defaultCameraLocation: LatLng(48.8566, 2.3522),
   zoomLevel: 12,
   scaledMarkerIconInfos: markerIconsInfos,
-  showDraggableSheet: true, // Optional, defaults to false
-  config: MarkerDraggableSheetConfig(
+  overlayContent: MarkerDraggableSheetConfig(
     showTopIndicator: false,
     boxShadow: [
       BoxShadow(

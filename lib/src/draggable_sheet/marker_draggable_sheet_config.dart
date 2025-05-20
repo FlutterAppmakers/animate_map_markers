@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../animate_map_markers.dart';
 
-class MarkerDraggableSheetConfig {
+class MarkerDraggableSheetConfig extends MarkerOverlayContent {
   /// The content widget to be displayed inside the [MarkerDraggableSheet].
   final Widget child;
 

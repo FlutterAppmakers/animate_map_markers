@@ -23,8 +23,7 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
     this.style,
     this.onMapCreated,
     required this.scaledMarkerIconInfos,
-    this.showDraggableSheet = false,
-    this.config = const MarkerDraggableSheetConfig(child: SizedBox()),
+    this.overlayContent,
     // other google maps params
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
     this.compassEnabled = true,
@@ -71,17 +70,20 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
   /// Markers to be placed on the map. (apart from animated map markers).
   final Set<Marker> markers;
 
-  /// The configuration object for customizing the behavior and appearance of the draggable sheet.
+  /// Provides custom overlay content to display above the map, such as a
+  /// draggable bottom sheet or a horizontal swipeable card view (PageView).
   ///
-  /// Provides properties such as `initialChildSize`, `maxChildSize`, `curve`, `duration`,
-  /// and more to control how the sheet behaves and looks.
+  /// Use this property to define how additional marker-related UI should be
+  /// presented. It accepts subclasses of [MarkerOverlayContent], such as:
   ///
-  /// Defaults are defined within [MarkerDraggableSheetConfig].
-  final MarkerDraggableSheetConfig config;
+  /// - [MarkerDraggableSheetConfig]: displays a draggable bottom sheet
+  ///   containing marker information.
+  /// - [MarkerSwipeCardConfig]: displays a swipeable horizontal card layout
+  ///   that syncs with markers on the map.
+  ///
+  /// If `overlayContent` is `null`, no overlay will be shown.
 
-  /// Controls whether the draggable marker info sheet is shown below the map.
-  /// Set to `true` to show the sheet, or `false` to hide it. Defaults to `false`.
-  final bool showDraggableSheet;
+  final MarkerOverlayContent? overlayContent;
 
   /// The list of markers that will be animated using scaling effects.
   ///
@@ -422,14 +424,19 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
                         });
                   });
             }),
+        if (widget.overlayContent is MarkerDraggableSheetConfig)
 
-        /// Draggable sheet to display additional content when a marker is tapped
-        DraggableSheetWrapper(
-            showDraggableSheet: widget.showDraggableSheet,
-            selectedMarkerIdNotifier: _selectedMarkerId,
-            markerAnimationControllers: _markerAnimationControllers,
-            markerSheetController: markerSheetController,
-            config: widget.config),
+          /// Draggable sheet to display additional content when a marker is tapped
+          DraggableSheetWrapper(
+              // showDraggableSheet: widget.showDraggableSheet,
+              selectedMarkerIdNotifier: _selectedMarkerId,
+              markerAnimationControllers: _markerAnimationControllers,
+              markerSheetController: markerSheetController,
+              config: widget.overlayContent as MarkerDraggableSheetConfig)
+        // else if(widget.overlayContent is MarkerSwipeCardConfig)
+
+        else
+          SizedBox.shrink()
       ],
     );
   }
