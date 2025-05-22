@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:animate_map_markers/src/draggable_sheet/draggable_sheet_wrapper.dart';
+import 'package:animate_map_markers/src/swipe_cards/marker_swipe_card_wrapper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -272,11 +273,16 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _originalIconsNotifier =
       ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
 
+  late PageController ctrl;
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    ctrl = PageController(viewportFraction: 0.75);
     _futureData = _initializeAnimationMarkers();
+
   }
 
   /// Initialize the animation controller for each marker
@@ -333,6 +339,15 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 
             /// Trigger the sheet animation
             markerSheetController.animateSheet();
+
+            final index = widget.scaledMarkerIconInfos.indexWhere((info) => info.markerId == markerId);
+            print("index is#### $index");
+
+            final indexPage = (index == -1) ? 0: index;
+              /// jump to Marker swipe card index
+              ctrl.animateToPage(indexPage, duration: const Duration(milliseconds: 500), curve: Curves.linear);
+
+
           },
           markerAnimationController: _markerAnimationControllers,
         );
@@ -428,12 +443,34 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 
           /// Draggable sheet to display additional content when a marker is tapped
           DraggableSheetWrapper(
-              // showDraggableSheet: widget.showDraggableSheet,
               selectedMarkerIdNotifier: _selectedMarkerId,
               markerAnimationControllers: _markerAnimationControllers,
               markerSheetController: markerSheetController,
               config: widget.overlayContent as MarkerDraggableSheetConfig)
-        // else if(widget.overlayContent is MarkerSwipeCardConfig)
+        else if(widget.overlayContent is MarkerSwipeCardConfig)
+          MarkerSwipeCardWrapper(
+              selectedMarkerIdNotifier: _selectedMarkerId,
+              markerAnimationControllers: _markerAnimationControllers,
+              config: widget.overlayContent as MarkerSwipeCardConfig,
+            scaledMarkerIconInfos: widget.scaledMarkerIconInfos,
+            mapControllerCompleter: _mapsControllerCompleter,
+            pageCtrl: ctrl,
+          )
+        //  MarkerSwipeCard(config: widget.overlayContent as MarkerSwipeCardConfig)
+        /*  MarkerSwipeCard(
+            height: MediaQuery.of(context).size.height * 0.43,
+            onPageChanged: (index){
+
+             }, itemBuilder: (BuildContext context, int index) { 
+               return PageViewItem(
+                   index: index,
+                   height: MediaQuery.of(context).size.height * 0.4,
+                   child: Container(color: Colors.red,)
+               );
+             }, length: widget.scaledMarkerIconInfos.length,
+             )*/
+             // child:MarkerSwipeCard(config: widget.overlayContent as MarkerSwipeCardConfig)
+
 
         else
           SizedBox.shrink()
