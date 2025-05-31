@@ -1,6 +1,6 @@
-# Animate Map Markers
+# Animate Map Markers 
 
-Animation utility for the google_maps_flutter package.
+Animation utilities for markers of the google_maps_flutter package.
 
 animate_map_markers is a flexible and performant Flutter package that brings your Google Maps markers to life with 
 smooth scaling animations

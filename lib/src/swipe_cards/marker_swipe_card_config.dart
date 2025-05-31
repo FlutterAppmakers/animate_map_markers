@@ -2,7 +2,6 @@ import 'package:animate_map_markers/animate_map_markers.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-import 'marker_swipe_card_option.dart';
 
 class MarkerSwipeCardConfig extends MarkerOverlayContent {
   /// The widgets to be shown in the carousel of default constructor

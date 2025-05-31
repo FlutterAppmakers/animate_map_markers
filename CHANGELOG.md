@@ -18,3 +18,6 @@
 ## 0.0.4
 - Added support for animating markers in sync with a carousel slider.
 - Improved example app to demonstrate marker animations linked to carousel item selection.
+
+## 0.0.5
+- Resolve pub.dev analyzer warnings and update package description and screenshots
