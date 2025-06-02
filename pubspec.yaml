@@ -1,10 +1,12 @@
 name: animate_map_markers
 description: "Animation utilities for markers of the google_maps_flutter package."
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/FlutterAppmakers/animate_map_markers
 repository: https://github.com/FlutterAppmakers/animate_map_markers
 issue_tracker: https://github.com/FlutterAppmakers/animate_map_markers/issues
 screenshots:
+  - description: animated markers with elastic Effect cards
+    path: gifs/animated-markers-elastic-carousel.gif
   - description: animated markers with carousel slider
     path: gifs/animated-markers-carousel.gif
   - description: Animated markers

@@ -16,8 +16,15 @@
 - Fixed a `RenderFlex overflow` issue in the example app's marker animation layout.
 
 ## 0.0.4
+
 - Added support for animating markers in sync with a carousel slider.
 - Improved example app to demonstrate marker animations linked to carousel item selection.
 
 ## 0.0.5
+
 - Resolve pub.dev analyzer warnings and update package description and screenshots
+
+## 0.0.6
+
+- Add NeverScrollCardOption for non-scrollable carousel with elasticOut animation on marker tap
+- Remove border radius when draggable sheet reaches full screen (maxChildSize = 1.0)

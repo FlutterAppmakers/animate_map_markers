@@ -1,10 +1,10 @@
-import 'base_swipe_card_option.dart';
+import 'package:animate_map_markers/src/swipe_cards/base_swipe_card_option.dart';
+import 'package:flutter/material.dart';
 
-class MarkerSwipeCardOption extends BaseSwipeCardOption {
-  MarkerSwipeCardOption({
+class NeverScrollCardOption extends BaseSwipeCardOption {
+  NeverScrollCardOption({
     super.height,
     super.aspectRatio,
-    super.viewportFraction,
     super.initialPage,
     super.enableInfiniteScroll,
     super.animateToClosest,
@@ -16,7 +16,6 @@ class MarkerSwipeCardOption extends BaseSwipeCardOption {
     super.enlargeCenterPage,
     super.onPageChanged,
     super.onScrolled,
-    super.scrollPhysics,
     super.pageSnapping,
     super.scrollDirection,
     super.pauseAutoPlayOnTouch,
@@ -28,5 +27,7 @@ class MarkerSwipeCardOption extends BaseSwipeCardOption {
     super.disableCenter,
     super.padEnds,
     super.clipBehavior,
-  });
+  }) : super(
+            scrollPhysics: const NeverScrollableScrollPhysics(),
+            viewportFraction: 1.0);
 }

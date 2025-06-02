@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:animate_map_markers/src/swipe_cards/base_swipe_card_option.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -364,13 +365,38 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
         break;
 
       case MarkerSwipeCardConfig():
+
+        /// jump to Marker swipe card index
         final index = widget.scaledMarkerIconInfos
             .indexWhere((info) => info.markerId == markerId);
 
         final indexPage = (index == -1) ? 0 : index;
 
-        /// jump to Marker swipe card index
+        final config = widget.overlayContent as MarkerSwipeCardConfig;
+        _animateCarousel(config.options, indexPage);
+        break;
+      default:
+
+        /// no action
+        break;
+    }
+  }
+
+  /// Animates the carousel to the given page index using behavior
+  /// defined by the specific [BaseSwipeCardOption] subclass.
+  ///
+  /// If [options] is [NeverScrollCardOption], the animation uses an
+  /// elasticOut curve. For [MarkerSwipeCardOption], a default animation
+  /// is performed. Otherwise, no animation occurs.
+
+  void _animateCarousel(BaseSwipeCardOption options, int indexPage) {
+    switch (options) {
+      case MarkerSwipeCardOption():
         carouselSliderController.animateToPage(indexPage);
+        break;
+      case NeverScrollCardOption():
+        carouselSliderController.animateToPage(indexPage,
+            curve: Curves.elasticOut);
         break;
       default:
 

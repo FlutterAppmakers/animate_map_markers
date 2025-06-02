@@ -2,6 +2,7 @@ import 'package:animate_map_markers/animate_map_markers.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import 'base_swipe_card_option.dart';
 
 class MarkerSwipeCardConfig extends MarkerOverlayContent {
   /// The widgets to be shown in the carousel of default constructor
@@ -13,7 +14,7 @@ class MarkerSwipeCardConfig extends MarkerOverlayContent {
   final bool? disableGesture;
 
   /// Configuration options for the swipe card behavior and appearance.
-  final MarkerSwipeCardOption options;
+  final BaseSwipeCardOption options;
 
   /// Distance from the bottom of the map to the swipe card.
   ///

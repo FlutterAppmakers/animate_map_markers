@@ -1,8 +1,7 @@
+import 'package:animate_map_markers/src/swipe_cards/base_swipe_card_option.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-import 'marker_swipe_card_option.dart';
-
-extension MarkerSwipeCardOptionExt on MarkerSwipeCardOption {
+extension MarkerSwipeCardOptionExt on BaseSwipeCardOption {
   CarouselOptions toCarouselOptions({
     void Function(int index, CarouselPageChangedReason reason)?
         onPageChangedCallback,
