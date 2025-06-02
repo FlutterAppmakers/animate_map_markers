@@ -1,4 +1,5 @@
 import 'package:animate_map_markers/src/opacity_tween.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'marker_draggable_sheet_config.dart';
 import 'marker_sheet_controller.dart';
@@ -49,6 +50,7 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
   final sheet = GlobalKey();
   final controller = DraggableScrollableController();
   final ValueNotifier<double> currentChildSizeNotifier = ValueNotifier(0);
+  static const double factor = 0.95;
 
   @override
   void initState() {
@@ -119,21 +121,27 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
           return ValueListenableBuilder<double>(
               valueListenable: currentChildSizeNotifier,
               builder: (context, currentSheetSize, _) {
+                final hasSafeArea =
+                    (currentSheetSize > config.maxChildSize * factor) &&
+                        (config.maxChildSize == 1);
                 return DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: config.sheetColor,
                     boxShadow: config.boxShadow,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(config.topCornerRadius),
-                      topRight: Radius.circular(config.topCornerRadius),
-                    ),
+                    borderRadius: (currentSheetSize < factor)
+                        ? BorderRadius.only(
+                            topLeft: Radius.circular(config.topCornerRadius),
+                            topRight: Radius.circular(config.topCornerRadius))
+                        : null,
                   ),
                   child: SafeArea(
-                    top: currentSheetSize == config.maxChildSize,
+                    top: hasSafeArea,
                     child: CustomScrollView(
                       controller: scrollController,
                       slivers: [
-                        topButtonIndicator(currentSheetSize: currentSheetSize),
+                        topButtonIndicator(
+                            currentSheetSize: currentSheetSize,
+                            hasSafeArea: hasSafeArea),
                         SliverToBoxAdapter(
                           child: config.child,
                         ),
@@ -149,11 +157,11 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
     });
   }
 
-  SliverToBoxAdapter topButtonIndicator({required double currentSheetSize}) {
+  SliverToBoxAdapter topButtonIndicator(
+      {required double currentSheetSize, required bool hasSafeArea}) {
     final config = widget.config;
     final shouldAnimate = !config.showTopIndicator;
-    final shouldShow =
-        config.showTopIndicator || currentSheetSize < config.dynamicThreshold;
+    final shouldShow = currentSheetSize < config.dynamicThreshold;
 
     final indicator = Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -184,9 +192,10 @@ class MarkerDraggableSheetState extends State<MarkerDraggableSheet> {
     }
 
     return SliverToBoxAdapter(
-        child: OpacityTween(
-            begin: shouldShow ? 0.0 : 1.0,
-            end: shouldShow ? 1.0 : 0.0,
-            child: indicator));
+      child: OpacityTween(
+          begin: shouldShow ? 0.0 : 1.0,
+          end: shouldShow ? 1.0 : 0.0,
+          child: (!hasSafeArea) ? indicator : SizedBox.shrink()),
+    );
   }
 }

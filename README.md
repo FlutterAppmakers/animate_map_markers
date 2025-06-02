@@ -32,6 +32,13 @@ active marker on the map.
 |---------------------------------------------------------------------------------------------------------------------------------|
 | <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/animated-markers-carousel.gif" height= "400"> |
 
+### Animated Map Markers with Elastic Effect cards
+
+| Animated Map Markers with Elastic Effect cards                                                                                                   |
+|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/animated-markers-elastic-carousel.gif" height= "400"> |
+
+
 ### Animated Map Markers
 
 | Animated Map Markers                                                                                                            |
@@ -197,6 +204,44 @@ return AnimatedMapMarkersWidget(
    /// perform additional actions when the carousel page changes
    },
   ),
+ ),
+);
+
+
+```
+
+## 🔧 Carousel Options
+You can customize the swipe behavior by supplying a subclass of BaseSwipeCardOption. Two built-in options are available:
+
+## ✅ MarkerSwipeCardOption
+Enables horizontal swipe gestures.
+
+Supports CarouselOptions from carousel_slider.
+
+Ideal for use cases where you want users to scroll between cards.
+
+## 🚫 NeverScrollCardOption
+Disables user scrolling completely.
+
+Useful when you want to show a static card linked to a marker without any swipe behavior.
+
+Automatically sets scrollPhysics to NeverScrollableScrollPhysics() and viewportFraction to 1.0.
+
+💡 When the user taps on a marker, the carousel animates to the corresponding page using an elastic-out effect, providing a smooth and interactive experience.
+
+```dart
+return AnimatedMapMarkersWidget(
+  defaultCameraLocation: LatLng(48.8566, 2.3522),
+  zoomLevel: 12,
+  scaledMarkerIconInfos: markerIconsInfos,
+  overlayContent:MarkerSwipeCardConfig(
+   bottom: 30,
+ /// Provide a list of widgets to display in the carousel (e.g. restaurant cards)
+  items: restaurantCards,
+   options:  NeverScrollCardOption(
+   height: 200.0,
+   onPageChanged: (_, __) {},
+),
  ),
 );
 

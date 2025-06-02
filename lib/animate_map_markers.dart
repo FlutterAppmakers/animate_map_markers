@@ -13,3 +13,4 @@ export 'src/marker_overlay/marker_overlay_content.dart';
 export 'src/swipe_cards/marker_swipe_card.dart';
 export 'src/swipe_cards/marker_swipe_card_config.dart';
 export 'src/swipe_cards/marker_swipe_card_option.dart';
+export 'src/swipe_cards/never_scroll_card_option.dart';

@@ -51,6 +51,7 @@ class AnimatedMapMarkersDemoApp extends StatelessWidget {
         '/basic': (_) => const BasicDemo(),
         '/with_draggable_sheet': (_) => const SheetDemo(),
         '/with_carousel': (_) => CarouselDemo(),
+        '/elastic_carousel': (_) => ElasticCardDemo(),
         '/material_icon': (_) => const MaterialIconDemo(),
         '/svg': (_) => const SvgMarkerDemo(),
       },
@@ -72,6 +73,7 @@ class DemoHome extends StatelessWidget {
           DemoItem(title: 'Basic Animated Markers', route: '/basic'),
           DemoItem(title: 'Draggable Sheet', route: '/with_draggable_sheet'),
           DemoItem(title: 'Carousel Slider', route: '/with_carousel'),
+          DemoItem(title: 'Elastic Carousel', route: '/elastic_carousel'),
           DemoItem(title: 'Material Icon', route: '/material_icon'),
           DemoItem(title: 'Svg', route: '/svg')
         ],
@@ -231,7 +233,40 @@ class CarouselDemo extends StatelessWidget {
           options: MarkerSwipeCardOption(
             height: 200.0,
             viewportFraction: 0.9,
-            // enlargeCenterPage: true,
+            onPageChanged: (_, __) {},
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A demo that showcases [AnimatedMapMarkersWidget] with non-scrollable
+/// cards that animate into view with an elastic out effect when tapping a marker.
+
+class ElasticCardDemo extends StatelessWidget {
+  ElasticCardDemo({super.key});
+
+  final List<Widget> restaurantCards = sample
+      .map((restaurant) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: RestaurantCard(restaurant: restaurant),
+          ))
+      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Elastic Card Animation')),
+      body: AnimatedMapMarkersWidget(
+        defaultCameraLocation: newYorkCenter,
+        zoomLevel: 13,
+        scaledMarkerIconInfos: generateMarkers(),
+        overlayContent: MarkerSwipeCardConfig(
+          bottom: 55.0,
+          items: restaurantCards,
+          options: NeverScrollCardOption(
+            height: 200.0,
             onPageChanged: (_, __) {},
           ),
         ),
@@ -418,7 +453,6 @@ class RestaurantCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: restaurantTextStyle,
                 ),
-                // Text(restaurant.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: restaurantTextStyle,),
               ],
             ),
           ),

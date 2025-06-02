@@ -36,6 +36,11 @@ class MarkerDraggableSheetConfig extends MarkerOverlayContent {
   /// If null, no shadow will be applied.
   final List<BoxShadow>? boxShadow;
 
+  /// the background color of the sheet
+  ///
+  /// Defaults to `Colors.white`
+  final Color sheetColor;
+
   /// The color of the top button indicator.
   ///
   /// Defaults to [Colors.black45]
@@ -44,7 +49,6 @@ class MarkerDraggableSheetConfig extends MarkerOverlayContent {
   /// The curve of the animation.
   ///
   /// Defaults to [Curves.easeInOut].
-  ///
   final Curve curve;
 
   /// The duration of the animation.
@@ -55,7 +59,7 @@ class MarkerDraggableSheetConfig extends MarkerOverlayContent {
   /// Determines whether the top button indicator is visible.
   ///
   /// If set to `true`, the top button indicator is always shown. If set to `false`,
-  /// the indicator is shown only when the `currentSheetSize` is less than 0.6.
+  /// the indicator is shown only when the `currentSheetSize` is less than `dynamicThreshold` (Defaults to 0.6).
   ///
   /// Defaults to `true`.
   final bool showTopIndicator;
@@ -83,6 +87,7 @@ class MarkerDraggableSheetConfig extends MarkerOverlayContent {
       this.reverseAnimationSize = 0.1,
       this.topCornerRadius = 22.0,
       this.boxShadow,
+      this.sheetColor = Colors.white,
       this.topButtonIndicatorColor = Colors.black45,
       this.curve = Curves.easeInOut,
       this.duration = const Duration(milliseconds: 50),
