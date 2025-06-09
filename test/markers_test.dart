@@ -34,6 +34,7 @@ void main() {
         vsync: tester,
         duration: const Duration(milliseconds: 100), // shorter duration
         scaler: mockMarkerScaler,
+        reverseDuration: const Duration(milliseconds: 100),
       );
 
       // listen to emitted icons
@@ -43,10 +44,10 @@ void main() {
       });
 
       // run animation
-      await controller.setupAnimationController();
+      controller.setupAnimationController();
 
       // 🔥 This actually starts the animation
-      await controller.animateMarker(MarkerId('test_marker'), true);
+      controller.animateMarker(MarkerId('test_marker'), true);
 
       // pump to start animation
       await tester.pump();

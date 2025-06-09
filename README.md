@@ -4,7 +4,6 @@ Animation utilities for markers of the google_maps_flutter package.
 
 animate_map_markers is a flexible and performant Flutter package that brings your Google Maps markers to life with 
 smooth scaling animations
-— whether they’re built from raster images, SVGs, or Material Icons.
 
 ✨ Features:
 - Smooth, customizable scaling animations for Google Maps markers.
@@ -19,7 +18,7 @@ active marker on the map.
 ✨ Why use it?
 - Bring your map to life with smooth and natural marker animations.
 
-- Works with any marker style — raster images, SVGs, or Material Icons.
+- Works with raster images and SVGs.
 
 - Seamless UI integration with optional carousel sliders or draggable bottom sheets.
 
@@ -128,13 +127,13 @@ import GoogleMaps
 
 # Syntax
 This guide will walk you through the steps to implement animated markers on Google Maps in Flutter using the AnimatedMapMarkersWidget.
-You can optionally integrate a draggable bottom sheet for added interactivity.
+You can optionally integrate a draggable bottom sheet or a carousel slider for added interactivity.
 
 ## 1. Create your MarkerIconInfo list
 Each MarkerIconInfo represents a marker you want to animate on the map, including its position, 
 appearance, and scale animation.
 
-### Using an asset image (PNG, JPG, or SVG):
+### Using an asset image (PNG , JPG or SVG):
 
 ```dart
 final markerIconsInfos = List.generate(7, (index) {
@@ -148,31 +147,6 @@ final markerIconsInfos = List.generate(7, (index) {
 });
 ```
 
-### Using a Material Icon:
-```dart
-final markerIconsInfos = [
-  MarkerIconInfo(
-    markerId: MarkerId('marker_1'),
-    position: LatLng(48.8566, 2.3522),
-    icon: Icon(
-      Icons.location_on,
-      color: Colors.amber,
-      size: 100,
-      shadows: [
-        Shadow(
-          color: Colors.black.withOpacity(0.5),
-          offset: Offset(2, 2),
-          blurRadius: 4,
-        ),
-      ],
-    ),
-    minMarkerSize: Size(35, 35),
-    scale: 1.7,
-  ),
-];
-
-
-```
 ## 2. Use AnimatedMapMarkersWidget in your widget tree
 
 This widget handles animated scaling for your markers
@@ -287,9 +261,9 @@ By default:
 
 - reverseCurve is set to Curves.linear
 
-- duration is set to Duration(milliseconds: 500),
+- duration is set to Duration(milliseconds: 300),
 
-- reverseDuration is set to Duration(milliseconds: 500),
+- reverseDuration is set to Duration(milliseconds: 300),
 
 These provide a playful scale-up and a neutral scale-down animation. You can change them to suit
 your app’s style.
@@ -299,11 +273,11 @@ final markerIconsInfos = [
   MarkerIconInfo(
     markerId: MarkerId('marker_1'),
     position: LatLng(48.8566, 2.3522),
-    assetPath: 'assets/your_image.svg',
+    assetPath: 'assets/your_image.png',
     minMarkerSize: Size(35, 35),
     scale: 2.0,
-    duration: const Duration(milliseconds: 700),
-    reverseDuration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 350),
+    reverseDuration: const Duration(milliseconds: 350),
     curve: Curves.easeOutBack,
     reverseCurve: Curves.easeInCubic,
   ),
@@ -311,23 +285,14 @@ final markerIconsInfos = [
 
 ```
 
-| Animated Map Markers with Raster Image Support                                                                                   |
-|----------------------------------------------------------------------------------------------------------------------------------|
-| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/screenshot_raster.png" height= "400"> |
-
-
-| Animated Map Markers  with SVG support                                                                                        |
-|-------------------------------------------------------------------------------------------------------------------------------|
-| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/screenshot_svg.png" height= "400"> |
-
-
-| Animated Map Markers with Icon Support                                                                                         |
-|--------------------------------------------------------------------------------------------------------------------------------|
-| <img src="https://raw.githubusercontent.com/FlutterAppmakers/animate_map_markers/main/gifs/screenshot_icon.png" height= "400"> |
-
 ## Contributors
 
 
 | Name            | GitHub | Linkedin |
 |-----------------|-------------------------------------|-------------------------------------|
 | Zarrami Khaoula | [github/FlutterAppmakers](https://github.com/FlutterAppmakers/) | [linkedin/khaoula-zarrami](https://www.linkedin.com/in/khaoula-zarrami-0b354358/) |
+
+
+## ⭐️ Like this package?
+If you find animate_map_markers useful, please consider ⭐️ starring the repo to show your support! 
+It helps others discover the package and motivates continued development.

@@ -5,7 +5,6 @@
 // - a basic animated map,
 // - markers with a draggable sheet,
 // - markers with a carousel slider,
-// - markers using Material icons,
 // - markers using SVG assets.
 // To run this example:
 // - Ensure you have a valid Google Maps API key set up in your Android, iOS and web project configuration.
@@ -52,7 +51,6 @@ class AnimatedMapMarkersDemoApp extends StatelessWidget {
         '/with_draggable_sheet': (_) => const SheetDemo(),
         '/with_carousel': (_) => CarouselDemo(),
         '/elastic_carousel': (_) => ElasticCardDemo(),
-        '/material_icon': (_) => const MaterialIconDemo(),
         '/svg': (_) => const SvgMarkerDemo(),
       },
     );
@@ -74,7 +72,6 @@ class DemoHome extends StatelessWidget {
           DemoItem(title: 'Draggable Sheet', route: '/with_draggable_sheet'),
           DemoItem(title: 'Carousel Slider', route: '/with_carousel'),
           DemoItem(title: 'Elastic Carousel', route: '/elastic_carousel'),
-          DemoItem(title: 'Material Icon', route: '/material_icon'),
           DemoItem(title: 'Svg', route: '/svg')
         ],
       ),
@@ -275,101 +272,6 @@ class ElasticCardDemo extends StatelessWidget {
   }
 }
 
-/// A demo using Material `Icons` as animated map markers with the
-/// `animate_map_markers` package and static marker positions.
-///
-/// This example renders a set of static `LatLng` locations (around New York)
-/// using the Flutter `Icons.location_on` widget as the marker content.
-///
-/// Features:
-/// - Uses `icon` property of [MarkerIconInfo] to render Flutter `Icon` widgets
-/// - Smooth animated scaling using `AnimatedMapMarkersWidget`
-///
-/// Tip:
-/// - You can customize the marker icon’s shadow, size, and color like any widget.
-
-class MaterialIconDemo extends StatelessWidget {
-  const MaterialIconDemo({super.key});
-
-  /// Generates a list of [MarkerIconInfo] using Material `Icons.location_on`.
-  List<MarkerIconInfo> _buildMaterialIconMarkers() {
-    return List.generate(staticLocations.length, (i) {
-      return MarkerIconInfo(
-        markerId: MarkerId('marker_$i'),
-        position: staticLocations[i],
-        icon: Icon(
-          Icons.location_on,
-          color: Colors.amber,
-          size: 100,
-          shadows: [
-            Shadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              offset: const Offset(2, 2),
-              blurRadius: 4,
-            ),
-          ],
-        ),
-        minMarkerSize: const Size(35, 35),
-        scale: 1.8,
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeInCubic,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Material Icon')),
-      body: AnimatedMapMarkersWidget(
-        defaultCameraLocation: newYorkCenter,
-        zoomLevel: 13,
-        scaledMarkerIconInfos: _buildMaterialIconMarkers(),
-      ),
-    );
-  }
-}
-
-/// Demo showing how to use SVG assets as animated map markers.
-///
-/// This example uses static marker positions and SVG images located in
-/// the assets folder (`assets/svg_map_marker.svg`).
-
-class SvgMarkerDemo extends StatelessWidget {
-  const SvgMarkerDemo({super.key});
-
-  static const Duration duration = Duration(milliseconds: 800);
-
-  /// Generates markers using an SVG asset.
-  List<MarkerIconInfo> _buildSvgMarkers() {
-    return List.generate(staticLocations.length, (i) {
-      return MarkerIconInfo(
-        markerId: MarkerId('svg_marker_$i'),
-        position: staticLocations[i],
-        assetPath: 'assets/svg_map_marker.svg',
-        minMarkerSize: const Size(40, 40),
-        scale: 1.8,
-        curve: Curves.fastOutSlowIn,
-        reverseCurve: Curves.decelerate,
-        duration: duration,
-        reverseDuration: duration,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('SVG Animated Markers')),
-      body: AnimatedMapMarkersWidget(
-        defaultCameraLocation: newYorkCenter,
-        zoomLevel: 13,
-        scaledMarkerIconInfos: _buildSvgMarkers(),
-      ),
-    );
-  }
-}
-
 class RestaurantCard extends StatelessWidget {
   final Restaurant restaurant;
 
@@ -462,6 +364,46 @@ class RestaurantCard extends StatelessWidget {
   }
 }
 
+/// Demo showing how to use SVG assets as animated map markers.
+///
+/// This example uses static marker positions and SVG images located in
+/// the assets folder (`assets/svg_map_marker.svg`).
+
+class SvgMarkerDemo extends StatelessWidget {
+  const SvgMarkerDemo({super.key});
+
+  static const Duration duration = Duration(milliseconds: 500);
+
+  /// Generates markers using an SVG asset.
+  List<MarkerIconInfo> _buildSvgMarkers() {
+    return List.generate(staticLocations.length, (i) {
+      return MarkerIconInfo(
+        markerId: MarkerId('svg_marker_$i'),
+        position: staticLocations[i],
+        assetPath: 'assets/map_marker.svg',
+        minMarkerSize: const Size(40, 40),
+        scale: 1.8,
+        curve: Curves.fastOutSlowIn,
+        reverseCurve: Curves.decelerate,
+        duration: duration,
+        reverseDuration: duration,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('SVG Animated Markers')),
+      body: AnimatedMapMarkersWidget(
+        defaultCameraLocation: newYorkCenter,
+        zoomLevel: 13,
+        scaledMarkerIconInfos: _buildSvgMarkers(),
+      ),
+    );
+  }
+}
+
 class Restaurant {
   final String name;
   final String image;
@@ -547,5 +489,14 @@ List<Restaurant> sample = [
     cuisine: "French/Seafood",
     description: "0.2 km fom downTown",
     location: "155 W 51st St, New York, NY",
+  ),
+  Restaurant(
+    name: "Taco Fiesta",
+    image:
+        "https://cdn.pixabay.com/photo/2020/05/22/08/17/breakfast-5204352_1280.jpg",
+    rating: 4.3,
+    cuisine: "Mexican",
+    description: "0.3 km fom downTown",
+    location: "88 9th Ave, New York, NY",
   ),
 ];

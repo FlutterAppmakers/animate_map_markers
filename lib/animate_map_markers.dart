@@ -1,4 +1,4 @@
-library animate_map_markers;
+library;
 
 export 'src/marker_scaler.dart';
 export 'src/marker_animation.dart';

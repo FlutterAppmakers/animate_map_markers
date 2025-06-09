@@ -9,10 +9,9 @@ class MarkerIconInfo {
     required this.minMarkerSize,
     required this.position,
     required this.scale,
-    this.icon,
-    this.assetPath,
-    this.duration = const Duration(milliseconds: 500),
-    this.reverseDuration = const Duration(milliseconds: 500),
+    required this.assetPath,
+    this.duration = const Duration(milliseconds: 300),
+    this.reverseDuration = const Duration(milliseconds: 300),
     this.curve = Curves.bounceOut,
     this.reverseCurve = Curves.linear,
     // other marker params
@@ -24,7 +23,7 @@ class MarkerIconInfo {
     this.infoWindow = InfoWindow.noText,
     this.rotation = 0.0,
     this.visible = true,
-    this.zIndex = 0.0,
+    this.zIndexInt = 0,
     this.clusterManagerId,
     this.onDrag,
     this.onDragStart,
@@ -38,25 +37,21 @@ class MarkerIconInfo {
   /// Geographical location of the marker.
   final LatLng position;
 
-  /// Material icon that can be passed which can be used
-  /// in place of a default [Marker].
-  final Icon? icon;
-
   /// Asset image path that can be passed which can be used
   /// in place of a default [Marker].
-  final String? assetPath;
+  final String assetPath;
 
   /// The base size of the marker before scaling.
   final Size minMarkerSize;
 
   /// The duration of the animation.
   ///
-  /// Defaults to 500 milliseconds.
+  /// Defaults to 300 milliseconds.
   final Duration duration;
 
   /// The reverse duration of the animation.
   ///
-  /// Defaults to 500 milliseconds.
+  /// Defaults to 300 milliseconds.
   final Duration reverseDuration;
 
   /// The curve of the animation.
@@ -117,7 +112,7 @@ class MarkerIconInfo {
   ///
   /// Overlays are drawn in order of z-index, so that lower values means drawn
   /// earlier, and thus appearing to be closer to the surface of the Earth.
-  final double zIndex;
+  final int zIndexInt;
 
   /// Marker clustering is managed by [ClusterManager] with [clusterManagerId].
   final ClusterManagerId? clusterManagerId;

@@ -5,7 +5,7 @@ import '../animate_map_markers.dart';
 ///
 /// The [markerId] corresponds to the tapped marker's unique identifier.
 ///
-typedef MarkerTapCallback = Future<void> Function(MarkerId markerId);
+typedef MarkerTapCallback = void Function(MarkerId markerId, LatLng position);
 
 class MarkerHelper {
   final Set<Marker> markers = {};
@@ -17,45 +17,15 @@ class MarkerHelper {
 
   /// A map of marker IDs to their associated animation controllers.
   ///
-  /// Each [MarkerAnimationController] handles animation logic (e.g. scaling or
+  /// Each [MarkerAnimationControllers] handles animation logic (e.g. scaling or
   /// bouncing) for an individual marker.
   ///
   /// Marker IDs must match those used in [createMarker] or elsewhere in the app.
   ///
-  final Map<MarkerId, MarkerAnimationController> markerAnimationController;
+  final Map<MarkerId, MarkerAnimationController> markerAnimationControllers;
 
-  MarkerHelper({this.onMarkerTapped, required this.markerAnimationController});
+  MarkerHelper({this.onMarkerTapped, required this.markerAnimationControllers});
 
-  /// Creates a [Marker] with full configuration and optional tap + drag callbacks.
-  ///
-  /// This method wraps the [Marker] constructor and adds internal tap handling
-  /// (including [onMarkerTapped] and selection state).
-  ///
-  /// See [Marker] for more details on each parameter.
-  ///
-  /// Example:
-  /// ```dart
-  /// final marker = markerHelper.createMarker(
-  ///   markerId: 'marker_1',
-  ///   position: LatLng(37.4219999, -122.0840575),
-  ///   icon: customIcon,
-  ///   draggable: true,
-  ///   onDragEnd: (newPosition) {
-  ///     print('Marker moved to $newPosition');
-  ///   },
-  /// );
-  /// ```
-  ///
-  /// - [markerId]: A unique identifier for the marker. This will also be used
-  ///   as the title in the [InfoWindow].
-  ///
-  /// - [icon]: A [BitmapDescriptor] representing the visual icon of the marker.
-  ///   This can be a default Google Maps icon or a custom scaled asset.
-  ///
-  /// - [position]: The [LatLng] coordinates where the marker will be placed on
-  ///   the map.
-  ///
-  /// Returns a fully configured [Marker] with built-in tap handling.
   Marker createMarker({
     required MarkerIconInfo markerIconInfo,
     BitmapDescriptor icon = BitmapDescriptor.defaultMarker,
@@ -74,14 +44,14 @@ class MarkerHelper {
         flat: markerIconInfo.flat,
         rotation: markerIconInfo.rotation,
         visible: markerIconInfo.visible,
-        zIndex: markerIconInfo.zIndex,
+        zIndexInt: markerIconInfo.zIndexInt,
         clusterManagerId: markerIconInfo.clusterManagerId,
-        onTap: () async {
-          markerIconInfo.onTap?.call();
+        onTap: () {
           if (onMarkerTapped != null) {
-            await onMarkerTapped!(markerIconInfo.markerId);
+            onMarkerTapped!(markerIconInfo.markerId, markerIconInfo.position);
           }
-          await selectMarker(markerIconInfo.markerId);
+          markerIconInfo.onTap?.call();
+          selectMarker(markerIconInfo.markerId);
         },
         onDrag: markerIconInfo.onDrag,
         onDragStart: markerIconInfo.onDragStart,
@@ -108,10 +78,11 @@ class MarkerHelper {
   /// [MarkerAnimationController], which must be pre-registered in
   /// [markerAnimationController].
   ///
-  Future<void> selectMarker(MarkerId markerId) async {
-    for (final entry in markerAnimationController.entries) {
+
+  void selectMarker(MarkerId markerId) {
+    for (final entry in markerAnimationControllers.entries) {
       final isSelected = entry.key == markerId;
-      await entry.value.animateMarker(entry.key, isSelected);
+      entry.value.animateMarker(entry.key, isSelected);
     }
   }
 }
