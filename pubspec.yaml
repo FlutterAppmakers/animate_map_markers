@@ -1,24 +1,20 @@
 name: animate_map_markers
 description: "Animation utilities for markers of the google_maps_flutter package."
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/FlutterAppmakers/animate_map_markers
 repository: https://github.com/FlutterAppmakers/animate_map_markers
 issue_tracker: https://github.com/FlutterAppmakers/animate_map_markers/issues
 screenshots:
-  - description: animated markers with elastic Effect cards
-    path: gifs/animated-markers-elastic-carousel.gif
   - description: animated markers with carousel slider
     path: gifs/animated-markers-carousel.gif
+  - description: animated markers with elastic Effect cards
+    path: gifs/animated-markers-elastic-carousel.gif
   - description: Animated markers
     path: gifs/animated-markers.gif
   - description: animated markers with draggable sheet
     path: gifs/animated-markers-sheet.gif
   - description:  animated markers using svg images
-    path: gifs/screenshot_svg.png
-  - description: animated markers using material icon
-    path: gifs/screenshot_icon.png
-  - description: animated markers using png images
-    path: gifs/screenshot_raster.png
+    path: gifs/animated-markers-svg.gif
 
 topics:
   - google-maps
@@ -31,9 +27,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^2.11.0
-  flutter_svg: ^2.1.0
+  google_maps_flutter: ^2.12.3
   carousel_slider: ^5.0.0
+  flutter_svg: ^2.2.0
 
 
 dev_dependencies:

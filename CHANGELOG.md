@@ -32,3 +32,12 @@
 
 ## 0.0.7
 - Add onTap callback to MarkerIconInfo for custom marker tap handling
+
+## 0.0.8
+
+- Add `animateToMarker` parameter to control whether the camera animates to the tapped marker's position.
+- Improve SVG marker scaling for sharper rendering across devices.
+- Fixe use of deprecated `zIndex` property in marker options.
+- Fixe an issue with marker animations when using the elastic carousel option.
+- Improve cache key generation for marker icon scaling to ensure accurate rendering and performance.
+

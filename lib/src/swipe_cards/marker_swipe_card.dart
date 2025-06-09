@@ -60,7 +60,9 @@ class _MarkerSwipeCardState extends State<MarkerSwipeCard> {
         items: config.items,
         options: config.options.toCarouselOptions(
             onPageChangedCallback: (index, reason) {
-          onPageChange(index, reason);
+          if (config.options is MarkerSwipeCardOption) {
+            onPageChange(index, reason);
+          }
         }),
         disableGesture: config.disableGesture,
         carouselController: widget.controller,
