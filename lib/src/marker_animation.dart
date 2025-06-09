@@ -136,7 +136,6 @@ class MarkerAnimationController {
 
     _runningAnimationControllers[markerId] = animationController;
 
-    // final originalIcon =  await markerScaler.scaleMarkerIcon(assetPath, minMarkerSize.width, minMarkerSize.height);
     final originalIcon =
         await markerScaler.createBitmapDescriptor(minMarkerSize);
     _originalIcons[markerId] = originalIcon;
@@ -151,15 +150,21 @@ class MarkerAnimationController {
   /// asynchronous icon generation.
   void _onAnimationTick() {
     final size = scaleAnimation.value;
+
     final width = size.width;
     final height = size.height;
-    final key = '$assetPath w$width h$height';
+    double roundedWidth = double.parse(width.toStringAsFixed(1));
+    double roundedHeight = double.parse(height.toStringAsFixed(1));
+    final key = '$assetPath w$roundedWidth h$roundedHeight';
+    print("Sizes #### markerId ### key  $size $markerId $key");
 
     if (_scaledIcons.containsKey(key)) {
+      print("Sizes3 #### markerId ### key $size $markerId  $key");
       _currentIcons[markerId] = _scaledIcons[key]!;
       _iconStreamController.add(_currentIcons[markerId]!);
     } else {
       // Schedule async bitmap generation without blocking listener
+      print("Sizes2 #### markerId ### key $size $markerId  $key");
       _generateAndCacheIcon(Size(width, height), key);
     }
   }
