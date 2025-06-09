@@ -1,5 +1,4 @@
 import 'package:animate_map_markers/src/opacity_tween.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'marker_draggable_sheet_config.dart';
 import 'marker_sheet_controller.dart';

@@ -28,3 +28,7 @@
 
 - Add NeverScrollCardOption for non-scrollable carousel with elasticOut animation on marker tap
 - Remove border radius when draggable sheet reaches full screen (maxChildSize = 1.0)
+
+
+## 0.0.7
+- Add onTap callback to MarkerIconInfo for custom marker tap handling

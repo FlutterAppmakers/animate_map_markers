@@ -29,6 +29,7 @@ class MarkerIconInfo {
     this.onDrag,
     this.onDragStart,
     this.onDragEnd,
+    this.onTap,
   });
 
   /// A unique identifier for the marker.
@@ -129,4 +130,7 @@ class MarkerIconInfo {
 
   /// Signature reporting the new [LatLng] at the end of a drag event.
   final Function(LatLng)? onDragEnd;
+
+  /// Callback triggered when the marker is tapped by the user.
+  final VoidCallback? onTap;
 }

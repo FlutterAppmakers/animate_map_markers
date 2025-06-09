@@ -77,6 +77,7 @@ class MarkerHelper {
         zIndex: markerIconInfo.zIndex,
         clusterManagerId: markerIconInfo.clusterManagerId,
         onTap: () async {
+          markerIconInfo.onTap?.call();
           if (onMarkerTapped != null) {
             await onMarkerTapped!(markerIconInfo.markerId);
           }
