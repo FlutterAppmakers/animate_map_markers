@@ -4,6 +4,9 @@ import 'package:animate_map_markers/animate_map_markers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+/// A cache of pre-scaled marker icons mapped by a unique key.
+final Map<String, BitmapDescriptor> _scaledIcons = {};
+
 /// A controller that handles animation and icon scaling for Google Map markers.
 ///
 /// This class uses Flutter animations to smoothly scale marker icons on the map
@@ -12,8 +15,6 @@ class MarkerAnimationController {
   /// The animation that controls the scaling size of the marker icon.
   late final Animation<Size> scaleAnimation;
 
-  /// A cache of pre-scaled marker icons mapped by a unique key.
-  final Map<String, BitmapDescriptor> _scaledIcons = {};
 
   /// A map of running animation controllers associated with their respective marker IDs.
   final Map<MarkerId, AnimationController> _runningAnimationControllers = {};
