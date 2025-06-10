@@ -140,7 +140,7 @@ class MarkerAnimationController {
     final originalIcon =
         await markerScaler.createBitmapDescriptor(minMarkerSize);
     _originalIcons[markerId] = originalIcon;
-    _originalIconStreamController.add(_originalIcons[markerId]!);
+    _originalIconStreamController.sink.add(_originalIcons[markerId]!);
 
     animationController.addListener(_onAnimationTick);
   }
@@ -162,7 +162,7 @@ class MarkerAnimationController {
     if (_scaledIcons.containsKey(key)) {
       print("Sizes3 #### markerId ### key $size $markerId  $key");
       _currentIcons[markerId] = _scaledIcons[key]!;
-      _iconStreamController.add(_currentIcons[markerId]!);
+      _iconStreamController.sink.add(_currentIcons[markerId]!);
     } else {
       // Schedule async bitmap generation without blocking listener
       print("Sizes2 #### markerId ### key $size $markerId  $key");
@@ -180,7 +180,7 @@ class MarkerAnimationController {
     final icon = await markerScaler.createBitmapDescriptor(size);
     _scaledIcons[key] = icon;
     _currentIcons[markerId] = icon;
-    _iconStreamController.add(icon);
+    _iconStreamController.sink.add(icon);
   }
 
   /// Animate marker by switching pre-generated icons
