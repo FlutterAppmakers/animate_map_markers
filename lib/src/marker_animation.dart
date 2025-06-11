@@ -32,14 +32,6 @@ class MarkerAnimationController {
   /// A stream of updated marker icons for listening to icon changes.
   Stream<BitmapDescriptor> get iconStream => _iconStreamController.stream;
 
-  /// Stream controller that broadcasts the original marker icons.
-  final StreamController<BitmapDescriptor> _originalIconStreamController =
-      StreamController<BitmapDescriptor>.broadcast();
-
-  /// A stream of original marker icons for listening to unscaled icon updates.
-  Stream<BitmapDescriptor> get originalIconStream =>
-      _originalIconStreamController.stream;
-
   /// Getter for accessing the _animationControllers map
   Map<MarkerId, AnimationController> get runningAnimationControllers =>
       _runningAnimationControllers;
@@ -137,10 +129,7 @@ class MarkerAnimationController {
 
     _runningAnimationControllers[markerId] = animationController;
 
-    final originalIcon =
-        await markerScaler.createBitmapDescriptor(minMarkerSize);
-    _originalIcons[markerId] = originalIcon;
-    _originalIconStreamController.sink.add(_originalIcons[markerId]!);
+    _generateAndCacheIcon(minMarkerSize);
 
     animationController.addListener(_onAnimationTick);
   }
@@ -151,13 +140,7 @@ class MarkerAnimationController {
   /// asynchronous icon generation.
   void _onAnimationTick() {
     final size = scaleAnimation.value;
-
-    final width = size.width;
-    final height = size.height;
-    double roundedWidth = double.parse(width.toStringAsFixed(1));
-    double roundedHeight = double.parse(height.toStringAsFixed(1));
-    final key = '$assetPath w$roundedWidth h$roundedHeight';
-    print("Sizes #### markerId ### key  $size $markerId $key");
+    String key = generateKey(size);
 
     if (_scaledIcons.containsKey(key)) {
       print("Sizes3 #### markerId ### key $size $markerId  $key");
@@ -166,14 +149,16 @@ class MarkerAnimationController {
     } else {
       // Schedule async bitmap generation without blocking listener
       print("Sizes2 #### markerId ### key $size $markerId  $key");
-      _generateAndCacheIcon(Size(width, height), key);
+      _generateAndCacheIcon(size);
     }
   }
 
   /// Asynchronously generates and caches the bitmap descriptor for a marker icon
   /// at the given size. If the icon is already cached, it returns early
   /// to avoid duplicate work.
-  void _generateAndCacheIcon(Size size, String key) async {
+  void _generateAndCacheIcon(Size size) async {
+    String key = generateKey(size);
+    print("Sizes #### markerId ### key  $size $markerId $key");
     // Avoid duplicate work
     if (_scaledIcons.containsKey(key)) return;
 
@@ -181,6 +166,15 @@ class MarkerAnimationController {
     _scaledIcons[key] = icon;
     _currentIcons[markerId] = icon;
     _iconStreamController.sink.add(icon);
+  }
+
+  String generateKey(Size size) {
+    final width = size.width;
+    final height = size.height;
+    double roundedWidth = double.parse(width.toStringAsFixed(1));
+    double roundedHeight = double.parse(height.toStringAsFixed(1));
+    final key = '$assetPath w$roundedWidth h$roundedHeight';
+    return key;
   }
 
   /// Animate marker by switching pre-generated icons
@@ -222,9 +216,6 @@ class MarkerAnimationController {
 
   /// Closes the internal stream controllers used for emitting marker icons.
   void disposeStreamControllers() {
-    if (!_originalIconStreamController.isClosed) {
-      _originalIconStreamController.close();
-    }
 
     if (!_iconStreamController.isClosed) {
       _iconStreamController.close();

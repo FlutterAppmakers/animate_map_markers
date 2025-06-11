@@ -270,8 +270,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 
   final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _currentIconsNotifier =
       ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
-  final ValueNotifier<Map<MarkerId, BitmapDescriptor>> _originalIconsNotifier =
-      ValueNotifier<Map<MarkerId, BitmapDescriptor>>({});
 
   final ValueNotifier<bool> isPageAnimatingFromMarker = ValueNotifier(false);
   final CarouselSliderController carouselSliderController =
@@ -309,11 +307,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
         ..[markerId] = updatedIcon;
     });
 
-    /// Listen for the original icon and store it
-    markerAnimationController.originalIconStream.listen((originalIcon) {
-      _originalIconsNotifier.value = Map.from(_originalIconsNotifier.value)
-        ..[markerId] = originalIcon;
-    });
 
     /// Start the animation
     markerAnimationController.setupAnimationController();
@@ -327,8 +320,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   }
 
   /// setting source and destination markers
-  Future<void> _setScaledMarkers(Map<MarkerId, BitmapDescriptor> currentIcons,
-      Map<MarkerId, BitmapDescriptor> originalIcons) async {
+  Future<void> _setScaledMarkers(Map<MarkerId, BitmapDescriptor> currentIcons) async {
     _markersMap.clear();
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       if (markerInfo.visible) {
@@ -339,7 +331,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
         );
 
         final icon = currentIcons[markerInfo.markerId] ??
-            originalIcons[markerInfo.markerId] ??
             BitmapDescriptor.defaultMarker;
 
         final marker = markerHelper.createMarker(
@@ -421,13 +412,9 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
               return ValueListenableBuilder<Map<MarkerId, BitmapDescriptor>>(
                   valueListenable: _currentIconsNotifier,
                   builder: (context, currentIcons, _) {
-                    return ValueListenableBuilder<
-                            Map<MarkerId, BitmapDescriptor>>(
-                        valueListenable: _originalIconsNotifier,
-                        builder: (context, originalIcons, _) {
                           if (!connectionWaiting) {
                             // Only scale markers after data is ready
-                            _setScaledMarkers(currentIcons, originalIcons);
+                            _setScaledMarkers(currentIcons);
                           }
 
                           return GoogleMap(
@@ -478,7 +465,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
                             onLongPress: widget.onLongPress,
                           );
                         });
-                  });
             }),
         if (widget.overlayContent is MarkerDraggableSheetConfig)
 
@@ -526,7 +512,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     stopMarkerAnimations();
     _selectedMarkerId.dispose();
     _currentIconsNotifier.dispose();
-    _originalIconsNotifier.dispose();
     isPageAnimatingFromMarker.dispose();
     super.dispose();
   }
