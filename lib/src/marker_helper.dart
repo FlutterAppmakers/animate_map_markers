@@ -5,7 +5,7 @@ import '../animate_map_markers.dart';
 ///
 /// The [markerId] corresponds to the tapped marker's unique identifier.
 ///
-typedef MarkerTapCallback = Future<void> Function(MarkerId markerId);
+typedef MarkerTapCallback = void Function(MarkerId markerId);
 
 class MarkerHelper {
   final Set<Marker> markers = {};
@@ -76,12 +76,12 @@ class MarkerHelper {
         visible: markerIconInfo.visible,
         zIndex: markerIconInfo.zIndex,
         clusterManagerId: markerIconInfo.clusterManagerId,
-        onTap: () async {
+        onTap: ()  {
           markerIconInfo.onTap?.call();
           if (onMarkerTapped != null) {
-            await onMarkerTapped!(markerIconInfo.markerId);
+             onMarkerTapped!(markerIconInfo.markerId);
           }
-          await selectMarker(markerIconInfo.markerId);
+             selectMarker(markerIconInfo.markerId);
         },
         onDrag: markerIconInfo.onDrag,
         onDragStart: markerIconInfo.onDragStart,
@@ -108,10 +108,10 @@ class MarkerHelper {
   /// [MarkerAnimationController], which must be pre-registered in
   /// [markerAnimationController].
   ///
-  Future<void> selectMarker(MarkerId markerId) async {
+  void selectMarker(MarkerId markerId)  {
     for (final entry in markerAnimationController.entries) {
       final isSelected = entry.key == markerId;
-      await entry.value.animateMarker(entry.key, isSelected);
+        entry.value.animateMarker(entry.key, isSelected);
     }
   }
 }

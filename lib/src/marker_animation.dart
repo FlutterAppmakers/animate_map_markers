@@ -176,7 +176,7 @@ class MarkerAnimationController {
   }
 
   /// Animate marker by switching pre-generated icons
-  Future<void> animateMarker(MarkerId markerId, bool selected) async {
+  void animateMarker(MarkerId markerId, bool selected)  {
     final animationController = _runningAnimationControllers[markerId];
     if (animationController != null) {
       if (selected) {

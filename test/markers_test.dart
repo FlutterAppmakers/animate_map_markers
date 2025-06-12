@@ -46,7 +46,7 @@ void main() {
        controller.setupAnimationController();
 
       // 🔥 This actually starts the animation
-      await controller.animateMarker(MarkerId('test_marker'), true);
+         controller.animateMarker(MarkerId('test_marker'), true);
 
       // pump to start animation
       await tester.pump();

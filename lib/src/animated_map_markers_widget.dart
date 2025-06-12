@@ -320,12 +320,12 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   }
 
   /// setting source and destination markers
-  Future<void> _setScaledMarkers(Map<MarkerId, BitmapDescriptor> currentIcons) async {
+  void _setScaledMarkers(Map<MarkerId, BitmapDescriptor> currentIcons){
     _markersMap.clear();
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       if (markerInfo.visible) {
         final markerHelper = MarkerHelper(
-          onMarkerTapped: (MarkerId markerId) async =>
+          onMarkerTapped: (MarkerId markerId) =>
               _handleMarkerTap(markerId),
           markerAnimationController: _markerAnimationControllers,
         );
