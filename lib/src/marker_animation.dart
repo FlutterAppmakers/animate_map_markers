@@ -108,7 +108,7 @@ class MarkerAnimationController {
   /// - Creates a [Tween] that scales the marker's size during the animation.
   /// - Preloads the original scaled icon and adds it to the stream controller.
   /// - Listens to the animation progress and updates marker icons dynamically based on the current animation value.
-  Future<void> setupAnimationController() async {
+  void setupAnimationController()  {
     // Now that the animationController is initialized, create the scaleAnimation
     final animationController = AnimationController(
         vsync: vsync, // Pass the TickerProvider to the AnimationController
@@ -129,7 +129,7 @@ class MarkerAnimationController {
 
     _runningAnimationControllers[markerId] = animationController;
 
-    _generateAndCacheIcon(minMarkerSize);
+     _generateAndCacheIcon(minMarkerSize);
 
     animationController.addListener(_onAnimationTick);
   }
@@ -138,7 +138,7 @@ class MarkerAnimationController {
   /// It checks whether the current icon for the marker has been generated and cached.
   /// If the icon exists in the cache, it is used immediately; if not, it triggers
   /// asynchronous icon generation.
-  void _onAnimationTick() {
+   void _onAnimationTick()  {
     final size = scaleAnimation.value;
     String key = generateKey(size);
 
@@ -149,23 +149,21 @@ class MarkerAnimationController {
     } else {
       // Schedule async bitmap generation without blocking listener
       print("Sizes2 #### markerId ### key $size $markerId  $key");
-      _generateAndCacheIcon(size);
+       _generateAndCacheIcon(size);
     }
   }
 
   /// Asynchronously generates and caches the bitmap descriptor for a marker icon
   /// at the given size. If the icon is already cached, it returns early
   /// to avoid duplicate work.
-  void _generateAndCacheIcon(Size size) async {
+  void _generateAndCacheIcon(Size size)  {
     String key = generateKey(size);
     print("Sizes #### markerId ### key  $size $markerId $key");
-    // Avoid duplicate work
-    if (_scaledIcons.containsKey(key)) return;
-
-    final icon = await markerScaler.createBitmapDescriptor(size);
-    _scaledIcons[key] = icon;
-    _currentIcons[markerId] = icon;
-    _iconStreamController.sink.add(icon);
+    markerScaler.createBitmapDescriptor(size).then((icon){
+      _scaledIcons[key] = icon;
+       _currentIcons[markerId] = icon;
+       _iconStreamController.sink.add(icon);
+    });
   }
 
   String generateKey(Size size) {

@@ -279,11 +279,11 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   void initState() {
     // TODO: implement initState
     super.initState();
-    _futureData = _initializeAnimationMarkers();
+    _initializeAnimationMarkers();
   }
 
   /// Initialize the animation controller for each marker
-  Future<void> _initializeAnimation(MarkerIconInfo markerIconInfo) async {
+  void _initializeAnimation(MarkerIconInfo markerIconInfo)  {
     final markerId = markerIconInfo.markerId;
 
     /// Initialize the controller
@@ -309,13 +309,13 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 
 
     /// Start the animation
-    markerAnimationController.setupAnimationController();
+     markerAnimationController.setupAnimationController();
   }
 
   /// Function to initialize animation markers
-  Future<void> _initializeAnimationMarkers() async {
+     void _initializeAnimationMarkers() {
     for (var markerInfo in widget.scaledMarkerIconInfos) {
-      await _initializeAnimation(markerInfo);
+       _initializeAnimation(markerInfo);
     }
   }
 
@@ -400,31 +400,18 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        FutureBuilder<void>(
-            future: _futureData,
-            builder: (context, snap) {
-              final connectionWaiting =
-                  snap.connectionState == ConnectionState.waiting;
-              if (snap.hasError) {
-                return Center(
-                    child: Text('Error initializing markers: ${snap.error}'));
-              }
-              return ValueListenableBuilder<Map<MarkerId, BitmapDescriptor>>(
+               ValueListenableBuilder<Map<MarkerId, BitmapDescriptor>>(
                   valueListenable: _currentIconsNotifier,
                   builder: (context, currentIcons, _) {
-                          if (!connectionWaiting) {
-                            // Only scale markers after data is ready
                             _setScaledMarkers(currentIcons);
-                          }
+
 
                           return GoogleMap(
                             initialCameraPosition: CameraPosition(
                                 target: widget.defaultCameraLocation,
                                 zoom: widget.zoomLevel),
-                            markers: connectionWaiting
-                                ? widget
-                                    .markers // fallback (no scaled markers yet)
-                                : {..._markersMap.values, ...widget.markers},
+                            markers:
+                                 {..._markersMap.values, ...widget.markers},
                             style: widget.style,
                             onMapCreated: (controller) {
                               _mapsControllerCompleter.complete(controller);
@@ -464,8 +451,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
                             onTap: widget.onTap,
                             onLongPress: widget.onLongPress,
                           );
-                        });
-            }),
+                        }),
         if (widget.overlayContent is MarkerDraggableSheetConfig)
 
           /// Draggable sheet to display additional content when a marker is tapped
