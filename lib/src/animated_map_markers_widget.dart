@@ -255,8 +255,8 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
       _mapsControllerCompleter.future;
 
   /// Animated Markers to be placed on the map.
-  final ValueNotifier<Map<MarkerId, Marker>> _markersMapNotifier =
-      ValueNotifier<Map<MarkerId, Marker>>({});
+  final ValueNotifier<Set<Marker>> _markersMapNotifier =
+      ValueNotifier<Set<Marker>>({});
 
   /// Map to store animation controllers for each marker
   final Map<MarkerId, MarkerAnimationController> _markerAnimationControllers =
@@ -279,9 +279,9 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     _initializeAnimationMarkers();
   }
 
-  Stream<Map<MarkerId, Marker>>? mapStream;
+  Stream<Marker>? mapStream;
 
-  StreamSubscription<Map<MarkerId, Marker>>? _mapStreamSubscription;
+  StreamSubscription<Marker>? _mapStreamSubscription;
 
   /// Initialize the animation controller for each marker
   void _initializeAnimation(MarkerIconInfo markerIconInfo) {
@@ -303,34 +303,30 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     _markerAnimationControllers[markerId] = markerAnimationController;
 
 
-    /// Start the animation
-    markerAnimationController.setupAnimationController();
-
     /// Listen to the stream and update the marker icon
     final iconStream = markerAnimationController.iconStream;
     mapStream = iconStream.scale(
         markerIconInfo, _markerAnimationControllers, _handleMarkerTap);
     if (mapStream != null) {
-      _mapStreamSubscription = mapStream!.listen((mapIcon) {
-        final marker = mapIcon[markerId];
-        if (marker != null) {
-          final currentMarkers = Map<MarkerId, Marker>.from(_markersMapNotifier.value);
-          currentMarkers[markerId] = marker;
+      _mapStreamSubscription = mapStream!.listen((marker) {
+
+          final currentMarkers = Set<Marker>.from(_markersMapNotifier.value);
+          /// Remove any existing marker with the same MarkerId
+          currentMarkers.removeWhere((m) => m.markerId == marker.markerId);
+          /// Add the new/updated marker
+          currentMarkers.add(marker);
+
+          /// Notify listeners
           _markersMapNotifier.value = currentMarkers;
-        }
+
       });
     }
-  }
 
-  Stream<Map<MarkerId, Marker>> setScaledMarkers() async* {
-    for (var markerIconInfo in widget.scaledMarkerIconInfos) {
-      final markerId = markerIconInfo.markerId;
-      yield* _markerAnimationControllers[markerId]!
-          .iconStream
-          .scale(markerIconInfo, _markerAnimationControllers, _handleMarkerTap);
+
+      /// Start the animation
+      markerAnimationController.setupAnimationController();
     }
-  }
-
+    
   /// Function to initialize animation markers
   void _initializeAnimationMarkers() {
     for (var markerInfo in widget.scaledMarkerIconInfos) {
@@ -395,14 +391,14 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ValueListenableBuilder<Map<MarkerId, Marker>>(
+        ValueListenableBuilder <Set<Marker>>(
             valueListenable: _markersMapNotifier,
             builder: (context, markersMap, _) {
               return GoogleMap(
                 initialCameraPosition: CameraPosition(
                     target: widget.defaultCameraLocation,
                     zoom: widget.zoomLevel),
-                markers: {...markersMap.values, ...widget.markers},
+                markers: {...markersMap, ...widget.markers},
                 style: widget.style,
                 onMapCreated: (controller) {
                   _mapsControllerCompleter.complete(controller);
@@ -496,7 +492,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 
 
 extension on Stream<BitmapDescriptor> {
-  Stream<Map<MarkerId, Marker>> scale(
+  Stream<Marker> scale(
       MarkerIconInfo markerInfo,
       Map<MarkerId, MarkerAnimationController> markerAnimationControllers,
       void Function(MarkerId)? handleMarkerTap,

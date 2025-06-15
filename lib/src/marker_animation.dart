@@ -18,9 +18,6 @@ class MarkerAnimationController {
   /// A map of running animation controllers associated with their respective marker IDs.
   final Map<MarkerId, AnimationController> _runningAnimationControllers = {};
 
-  /// A map holding the current displayed icons for each marker.
-  final Map<MarkerId, BitmapDescriptor> _currentIcons = {};
-
   /// A map holding the original (unscaled) icons for each marker.
   final Map<MarkerId, BitmapDescriptor> _originalIcons = {};
 
@@ -143,8 +140,7 @@ class MarkerAnimationController {
 
     if (_scaledIcons.containsKey(key)) {
       print("Sizes3 #### markerId ### key $size $markerId  $key");
-      _currentIcons[markerId] = _scaledIcons[key]!;
-        _iconStreamController.sink.add(_currentIcons[markerId]!);
+        _iconStreamController.sink.add(_scaledIcons[key]!);
     } else {
       // Schedule async bitmap generation without blocking listener
       print("Sizes2 #### markerId ### key $size $markerId  $key");
@@ -160,8 +156,7 @@ class MarkerAnimationController {
     print("Sizes #### markerId ### key  $size $markerId $key");
     markerScaler.createBitmapDescriptor(size).then((icon) {
       _scaledIcons[key] = icon;
-      _currentIcons[markerId] = icon;
-        _iconStreamController.sink.add(icon);
+      _iconStreamController.sink.add(icon);
     });
   }
 
