@@ -76,12 +76,12 @@ class MarkerHelper {
         visible: markerIconInfo.visible,
         zIndex: markerIconInfo.zIndex,
         clusterManagerId: markerIconInfo.clusterManagerId,
-        onTap: ()  {
+        onTap: () {
           markerIconInfo.onTap?.call();
           if (onMarkerTapped != null) {
-             onMarkerTapped!(markerIconInfo.markerId);
+            onMarkerTapped!(markerIconInfo.markerId);
           }
-             selectMarker(markerIconInfo.markerId);
+          selectMarker(markerIconInfo.markerId);
         },
         onDrag: markerIconInfo.onDrag,
         onDragStart: markerIconInfo.onDragStart,
@@ -108,10 +108,10 @@ class MarkerHelper {
   /// [MarkerAnimationController], which must be pre-registered in
   /// [markerAnimationController].
   ///
-  void selectMarker(MarkerId markerId)  {
+  void selectMarker(MarkerId markerId) {
     for (final entry in markerAnimationController.entries) {
       final isSelected = entry.key == markerId;
-        entry.value.animateMarker(entry.key, isSelected);
+      entry.value.animateMarker(entry.key, isSelected);
     }
   }
 }

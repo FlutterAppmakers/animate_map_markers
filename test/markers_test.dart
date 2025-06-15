@@ -33,7 +33,7 @@ void main() {
         assetPath: 'assets/map_marker.png',
         vsync: tester,
         duration: const Duration(milliseconds: 100), // shorter duration
-        scaler: mockMarkerScaler,
+        scaler: mockMarkerScaler, reverseDuration: const Duration(milliseconds: 100),
       );
 
       // listen to emitted icons
