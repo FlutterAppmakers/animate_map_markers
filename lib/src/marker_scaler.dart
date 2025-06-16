@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:animate_map_markers/src/extensions/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -37,7 +39,7 @@ class MarkerScaler {
   Future<BitmapDescriptor> createBitmapDescriptor(Size size) async {
     if (assetPath != null) {
       if (assetPath!.isSvg) {
-        return svgToBitmapDescriptor(assetName: assetPath!, size: size);
+        return await svgToBitmapDescriptor(assetName: assetPath!, size: size);
       } else {
         return await assetImageToBitmapDescriptor(
           assetPath: assetPath!,
@@ -83,17 +85,36 @@ class MarkerScaler {
   /// ### Parameters
   /// - [assetName]: The path to the SVG asset (must be listed in `pubspec.yaml`).
   /// - [size]: The target size (width and height) of the rendered marker icon.
+  ///
   Future<BitmapDescriptor> svgToBitmapDescriptor({
-    required String assetName,
-    required Size size,
-  }) async {
-    return SizedBox(
-      width: size.width,
-      height: size.height,
-      child: SvgPicture.asset(
-        assetName,
-      ),
-    ).toBitmapDescriptor();
+  required String assetName,
+  required Size size,
+      }) async {
+    final pictureInfo = await vg.loadPicture(SvgAssetLoader(assetName), null);
+
+    double devicePixelRatio =
+        ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+    int width = (size.width * devicePixelRatio).toInt();
+    int height = (size.height * devicePixelRatio).toInt();
+
+    final scaleFactor = min(
+      width / pictureInfo.size.width,
+      height / pictureInfo.size.height,
+    );
+
+    final recorder = ui.PictureRecorder();
+
+    ui.Canvas(recorder)
+      ..scale(scaleFactor)
+      ..drawPicture(pictureInfo.picture);
+
+    final rasterPicture = recorder.endRecording();
+
+    final image = rasterPicture.toImageSync(width, height);
+
+    final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!;
+
+    return BitmapDescriptor.bytes(bytes.buffer.asUint8List(), bitmapScaling: MapBitmapScaling.none);
   }
 
   /// Converts a [Icon] widget into a [BitmapDescriptor] for use with Google Maps markers.
