@@ -257,6 +257,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   /// Animated Markers to be placed on the map.
   final ValueNotifier<Set<Marker>> _markersMapNotifier =
       ValueNotifier<Set<Marker>>({});
+  final Map<MarkerId, Marker> _markerMap = {};
 
   /// Map to store animation controllers for each marker
   final Map<MarkerId, MarkerAnimationController> _markerAnimationControllers =
@@ -276,7 +277,10 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   void initState() {
     // TODO: implement initState
     super.initState();
-    _initializeAnimationMarkers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeAnimationMarkers();
+    });
+
   }
 
   Stream<Marker>? mapStream;
@@ -308,16 +312,15 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     mapStream = iconStream.scale(
         markerIconInfo, _markerAnimationControllers, _handleMarkerTap);
     if (mapStream != null) {
-      _mapStreamSubscription = mapStream!.listen((marker) {
+      _mapStreamSubscription = mapStream!.listen((updatedMarker) {
 
-          final currentMarkers = Set<Marker>.from(_markersMapNotifier.value);
-          /// Remove any existing marker with the same MarkerId
-          currentMarkers.removeWhere((m) => m.markerId == marker.markerId);
-          /// Add the new/updated marker
-          currentMarkers.add(marker);
+        final markerId = updatedMarker.markerId;
 
-          /// Notify listeners
-          _markersMapNotifier.value = currentMarkers;
+        // Replace the old marker with the new one
+        _markerMap[markerId] = updatedMarker;
+
+        // Notify listeners to rebuild the map
+          _markersMapNotifier.value = _markerMap.values.toSet();
 
       });
     }
