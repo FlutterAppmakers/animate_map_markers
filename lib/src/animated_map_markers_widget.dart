@@ -273,19 +273,29 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   final CarouselSliderController carouselSliderController =
       CarouselSliderController();
 
+  late MarkerHelper markerHelper;
+  Stream<Marker>? mapStream;
+  StreamSubscription<Marker>? _mapStreamSubscription;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  //  WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeAnimationMarkers();
-    });
 
+       markerHelper = MarkerHelper(
+        onMarkerTapped: (MarkerId markerId, LatLng position) {
+          _handleMarkerTap(markerId,position) ;
+
+        },
+
+        markerAnimationControllers: _markerAnimationControllers,
+      );
+
+     _updateMarkers();
+   // });
   }
-
-  Stream<Marker>? mapStream;
-
-  StreamSubscription<Marker>? _mapStreamSubscription;
 
   /// Initialize the animation controller for each marker
   void _initializeAnimation(MarkerIconInfo markerIconInfo) {
@@ -307,28 +317,41 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     _markerAnimationControllers[markerId] = markerAnimationController;
 
 
-    /// Listen to the stream and update the marker icon
-    final iconStream = markerAnimationController.iconStream;
-    mapStream = iconStream.scale(
-        markerIconInfo, _markerAnimationControllers, _handleMarkerTap);
-    if (mapStream != null) {
-      _mapStreamSubscription = mapStream!.listen((updatedMarker) {
-
-        final markerId = updatedMarker.markerId;
-
-        // Replace the old marker with the new one
-        _markerMap[markerId] = updatedMarker;
-
-        // Notify listeners to rebuild the map
-          _markersMapNotifier.value = _markerMap.values.toSet();
-
-      });
-    }
-
-
       /// Start the animation
       markerAnimationController.setupAnimationController();
     }
+
+    void _updateMarker(MarkerAnimationController markerAnimationController, MarkerIconInfo markerIconInfo) {
+  /// Listen to the stream and update the marker icon
+  final iconStream = markerAnimationController.iconStream;
+  mapStream = iconStream.scale(
+      markerIconInfo, markerHelper);
+  if (mapStream != null) {
+  _mapStreamSubscription = mapStream!.listen((updatedMarker) {
+
+  final markerId = updatedMarker.markerId;
+
+  // Replace the old marker with the new one
+  _markerMap[markerId] = updatedMarker;
+
+  // Notify listeners to rebuild the map
+  _markersMapNotifier.value = _markerMap.values.toSet();
+
+  });
+  }
+}
+
+void _updateMarkers() {
+  for (var markerIconInfo in widget.scaledMarkerIconInfos) {
+    final markerAnimationController = _markerAnimationControllers[markerIconInfo.markerId];
+    if ( markerAnimationController != null ){
+      _updateMarker(markerAnimationController, markerIconInfo);
+    }
+
+  }
+}
+
+
     
   /// Function to initialize animation markers
   void _initializeAnimationMarkers() {
@@ -337,7 +360,8 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     }
   }
 
-  void _handleMarkerTap(MarkerId markerId) {
+
+  void _handleMarkerTap(MarkerId markerId, LatLng position) {
     _selectedMarkerId.value = markerId;
 
     isPageAnimatingFromMarker.value = true;
@@ -390,7 +414,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
     }
   }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -497,12 +521,10 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 extension on Stream<BitmapDescriptor> {
   Stream<Marker> scale(
       MarkerIconInfo markerInfo,
-      Map<MarkerId, MarkerAnimationController> markerAnimationControllers,
-      void Function(MarkerId)? handleMarkerTap,
+      MarkerHelper markerHelper,
       ) {
     return transform(ScaleMarkerTransformer(
-        markerAnimationControllers: markerAnimationControllers,
         markerInfo: markerInfo,
-        handleMarkerTap: handleMarkerTap));
+        markerHelper: markerHelper));
   }
 }

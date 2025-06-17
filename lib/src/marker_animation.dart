@@ -185,18 +185,21 @@ class MarkerAnimationController {
   ///
   /// - If the animation is completed or dismissed, it starts playing forward.
   /// - If the animation is currently playing forward, it reverses the animation.
-  void toggleAnimationDirection(AnimationController animationController) {
+  void toggleAnimationDirection(AnimationController animationController)  {
     if (animationController.status == AnimationStatus.dismissed ||
         animationController.status == AnimationStatus.completed) {
+
       animationController.forward();
-    } else if (animationController.status == AnimationStatus.forward) {
+    }
+   else if (animationController.status == AnimationStatus.forward) {
       animationController.reverse();
     }
   }
 
   /// Reverses the animation controlled by the given [AnimationController].
   void reverseAnimation(AnimationController animationController) {
-    animationController.reverse();
+      animationController.reverse();
+
   }
 
   /// Dispose of the controller when it's no longer needed

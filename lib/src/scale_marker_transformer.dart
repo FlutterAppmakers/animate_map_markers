@@ -7,25 +7,20 @@ import '../animate_map_markers.dart';
 class ScaleMarkerTransformer
     extends StreamTransformerBase<BitmapDescriptor, Marker> {
   final MarkerIconInfo markerInfo;
-  final Map<MarkerId, MarkerAnimationController> markerAnimationControllers;
-  final void Function(MarkerId)? handleMarkerTap;
+  final MarkerHelper markerHelper;
   ScaleMarkerTransformer(
-      {required this.markerAnimationControllers,
+      {
         required this.markerInfo,
-        required this.handleMarkerTap});
+        required this.markerHelper
+      });
   @override
   Stream<Marker> bind(Stream<BitmapDescriptor> stream) {
     // TODO: implement bind
-    return stream.map((icon) => _setScaledMarker(icon, markerInfo));
+    return stream.map((icon) => _setScaledMarker(icon, markerInfo, markerHelper));
   }
 
   Marker _setScaledMarker(
-      BitmapDescriptor currentIcon, MarkerIconInfo markerInfo) {
-    final markerHelper = MarkerHelper(
-      onMarkerTapped: (MarkerId markerId) =>
-          handleMarkerTap!(markerId), //////// check null
-      markerAnimationController: markerAnimationControllers,
-    );
+      BitmapDescriptor currentIcon, MarkerIconInfo markerInfo, MarkerHelper markerHelper) {
 
     print("Marker id ${markerInfo.markerId} icon ${currentIcon}");
     final marker = markerHelper.createMarker(

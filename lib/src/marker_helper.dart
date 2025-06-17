@@ -5,7 +5,7 @@ import '../animate_map_markers.dart';
 ///
 /// The [markerId] corresponds to the tapped marker's unique identifier.
 ///
-typedef MarkerTapCallback = void Function(MarkerId markerId);
+typedef MarkerTapCallback = void Function(MarkerId markerId, LatLng  position);
 
 class MarkerHelper {
   final Set<Marker> markers = {};
@@ -17,14 +17,14 @@ class MarkerHelper {
 
   /// A map of marker IDs to their associated animation controllers.
   ///
-  /// Each [MarkerAnimationController] handles animation logic (e.g. scaling or
+  /// Each [MarkerAnimationControllers] handles animation logic (e.g. scaling or
   /// bouncing) for an individual marker.
   ///
   /// Marker IDs must match those used in [createMarker] or elsewhere in the app.
   ///
-  final Map<MarkerId, MarkerAnimationController> markerAnimationController;
+  final Map<MarkerId, MarkerAnimationController> markerAnimationControllers;
 
-  MarkerHelper({this.onMarkerTapped, required this.markerAnimationController});
+  MarkerHelper({this.onMarkerTapped, required this.markerAnimationControllers});
 
   /// Creates a [Marker] with full configuration and optional tap + drag callbacks.
   ///
@@ -56,6 +56,9 @@ class MarkerHelper {
   ///   the map.
   ///
   /// Returns a fully configured [Marker] with built-in tap handling.
+  ///
+  MarkerId? _selectedMarkerId; // To store the ID of the currently selected marker
+  MarkerId? _previousSelectedMarkerId; // To store the ID of the previously selected marker
   Marker createMarker({
     required MarkerIconInfo markerIconInfo,
     BitmapDescriptor icon = BitmapDescriptor.defaultMarker,
@@ -79,7 +82,7 @@ class MarkerHelper {
         onTap: () {
           markerIconInfo.onTap?.call();
           if (onMarkerTapped != null) {
-            onMarkerTapped!(markerIconInfo.markerId);
+            onMarkerTapped!(markerIconInfo.markerId, markerIconInfo.position);
           }
           selectMarker(markerIconInfo.markerId);
         },
@@ -109,9 +112,29 @@ class MarkerHelper {
   /// [markerAnimationController].
   ///
   void selectMarker(MarkerId markerId) {
-    for (final entry in markerAnimationController.entries) {
-      final isSelected = entry.key == markerId;
-      entry.value.animateMarker(entry.key, isSelected);
+    // Store the current selected marker as the previous one
+    _previousSelectedMarkerId = _selectedMarkerId;
+    // Set the newly tapped marker as the current selected one
+    _selectedMarkerId = markerId;
+    // You can now access _previousSelectedMarkerId and _selectedMarkerId
+    print('Previously selected marker: $_previousSelectedMarkerId');
+    print('Currently selected marker: $_selectedMarkerId');
+
+    if (_selectedMarkerId != null) {
+      final controller = markerAnimationControllers[_selectedMarkerId!];
+      if (controller != null) {
+        controller.animateMarker(
+            _selectedMarkerId!, true); /// Pass `true` for selected
+      }
+    }
+
+    if (_previousSelectedMarkerId != null &&
+        _previousSelectedMarkerId != _selectedMarkerId) {
+      final controller = markerAnimationControllers[_previousSelectedMarkerId!];
+      if (controller != null) {
+        controller.animateMarker(
+            _previousSelectedMarkerId!, false); // Pass `false` for deselected
+      }
     }
   }
 }
