@@ -39,16 +39,12 @@ class MarkerAnimationController {
   /// Creates a new [MarkerAnimationController].
   ///
   /// [assetPath] is used to load a marker image from assets.
-  /// [iconMarker] is used to render a Material [Icon] as the marker.
-  ///
-  /// You must provide either [assetPath] for an image icon or [iconMarker] for a Material icon.
 
   MarkerAnimationController({
     required this.markerId,
     required this.minMarkerSize,
     required this.scale,
-    this.assetPath,
-    this.iconMarker,
+    required this.assetPath,
     required this.vsync,
     required this.duration,
     required this.reverseDuration,
@@ -56,11 +52,8 @@ class MarkerAnimationController {
     this.reverseCurve = Curves.linear,
     MarkerScaler? scaler,
   }) : markerScaler =
-            scaler ?? MarkerScaler(assetPath: assetPath, icon: iconMarker);
+            scaler ?? MarkerScaler(assetPath: assetPath);
 
-  /// Material icon that can be passed which can be used
-  /// in place of a default [Marker].
-  final Icon? iconMarker;
 
   /// A unique identifier for the marker.
   final MarkerId markerId;
@@ -73,7 +66,7 @@ class MarkerAnimationController {
   final double scale;
 
   /// The asset path for the marker icon image.
-  final String? assetPath;
+  final String assetPath;
 
   /// The vsync of the animation.
   final TickerProvider vsync;

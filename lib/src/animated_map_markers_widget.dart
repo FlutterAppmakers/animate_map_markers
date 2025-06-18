@@ -307,7 +307,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
         minMarkerSize: markerIconInfo.minMarkerSize,
         scale: markerIconInfo.scale,
         assetPath: markerIconInfo.assetPath,
-        iconMarker: markerIconInfo.icon,
         duration: markerIconInfo.duration,
         reverseDuration: markerIconInfo.reverseDuration,
         curve: markerIconInfo.curve,

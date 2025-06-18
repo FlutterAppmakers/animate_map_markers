@@ -9,8 +9,7 @@ class MarkerIconInfo {
     required this.minMarkerSize,
     required this.position,
     required this.scale,
-    this.icon,
-    this.assetPath,
+    required this.assetPath,
     this.duration = const Duration(milliseconds: 500),
     this.reverseDuration = const Duration(milliseconds: 500),
     this.curve = Curves.bounceOut,
@@ -38,13 +37,9 @@ class MarkerIconInfo {
   /// Geographical location of the marker.
   final LatLng position;
 
-  /// Material icon that can be passed which can be used
-  /// in place of a default [Marker].
-  final Icon? icon;
-
   /// Asset image path that can be passed which can be used
   /// in place of a default [Marker].
-  final String? assetPath;
+  final String assetPath;
 
   /// The base size of the marker before scaling.
   final Size minMarkerSize;
