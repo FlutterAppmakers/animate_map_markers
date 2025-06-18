@@ -448,4 +448,13 @@ List<Restaurant> sample = [
     description: "0.2 km fom downTown",
     location: "155 W 51st St, New York, NY",
   ),
+  Restaurant(
+    name: "Taco Fiesta",
+    image:
+    "https://cdn.pixabay.com/photo/2020/05/22/08/17/breakfast-5204352_1280.jpg",
+    rating: 4.3,
+    cuisine: "Mexican",
+    description: "0.3 km fom downTown",
+    location: "88 9th Ave, New York, NY",
+  ),
 ];
