@@ -113,7 +113,6 @@ class MarkerHelper {
   ///
 
   void selectMarker(MarkerId markerId) {
-    print("markerAnimationControllers length ### ${markerAnimationControllers.length}");
     for (final entry in markerAnimationControllers.entries) {
       final isSelected = entry.key == markerId;
       entry.value.animateMarker(entry.key, isSelected);

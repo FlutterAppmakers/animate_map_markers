@@ -22,7 +22,6 @@ class ScaleMarkerTransformer
   Marker _setScaledMarker(
       BitmapDescriptor currentIcon, MarkerIconInfo markerInfo, MarkerHelper markerHelper) {
 
-    print("Marker id ${markerInfo.markerId} icon ${currentIcon}");
     final marker = markerHelper.createMarker(
       markerIconInfo: markerInfo,
       icon: currentIcon,

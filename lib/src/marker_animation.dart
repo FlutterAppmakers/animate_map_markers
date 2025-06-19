@@ -30,8 +30,6 @@ class MarkerAnimationController {
   Map<MarkerId, AnimationController> get runningAnimationControllers =>
       _runningAnimationControllers;
 
-  /// Getter for accessing the originalIcons
-
   final MarkerScaler markerScaler;
 
   /// Creates a new [MarkerAnimationController].
@@ -130,11 +128,9 @@ class MarkerAnimationController {
     String key = generateKey(size);
 
     if (_scaledIcons.containsKey(key)) {
-      print("Sizes3 #### markerId ### key $size $markerId  $key");
         _iconStreamController.sink.add(_scaledIcons[key]!);
     } else {
       // Schedule async bitmap generation without blocking listener
-      print("Sizes2 #### markerId ### key $size $markerId  $key");
       _generateAndCacheIcon(size);
     }
   }
@@ -144,7 +140,6 @@ class MarkerAnimationController {
   /// to avoid duplicate work.
   void _generateAndCacheIcon(Size size) {
     String key = generateKey(size);
-    print("Sizes #### markerId ### key  $size $markerId $key");
     markerScaler.createBitmapDescriptor(size).then((icon) {
       _scaledIcons[key] = icon;
       _iconStreamController.sink.add(icon);

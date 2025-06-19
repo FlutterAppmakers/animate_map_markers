@@ -281,7 +281,6 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
   void initState() {
     // TODO: implement initState
     super.initState();
-  //  WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeAnimationMarkers();
 
        markerHelper = MarkerHelper(
@@ -294,7 +293,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
       );
 
      _updateMarkers();
-   // });
+
   }
 
   /// Initialize the animation controller for each marker
@@ -330,10 +329,10 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
 
   final markerId = updatedMarker.markerId;
 
-  // Replace the old marker with the new one
+  /// Replace the old marker with the new one
   _markerMap[markerId] = updatedMarker;
 
-  // Notify listeners to rebuild the map
+  /// Notify listeners to rebuild the map
   _markersMapNotifier.value = _markerMap.values.toSet();
 
   });
@@ -350,15 +349,12 @@ void _updateMarkers() {
   }
 }
 
-
-    
   /// Function to initialize animation markers
   void _initializeAnimationMarkers() {
     for (var markerInfo in widget.scaledMarkerIconInfos) {
       _initializeAnimation(markerInfo);
     }
   }
-
 
   void _handleMarkerTap(MarkerId markerId, LatLng position) {
     _selectedMarkerId.value = markerId;
@@ -515,7 +511,6 @@ void _updateMarkers() {
     super.dispose();
   }
 }
-
 
 extension on Stream<BitmapDescriptor> {
   Stream<Marker> scale(
