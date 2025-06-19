@@ -125,7 +125,7 @@ import GoogleMaps
 
 # Syntax
 This guide will walk you through the steps to implement animated markers on Google Maps in Flutter using the AnimatedMapMarkersWidget.
-You can optionally integrate a draggable bottom sheet for added interactivity.
+You can optionally integrate a draggable bottom sheet or a carousel slider for added interactivity.
 
 ## 1. Create your MarkerIconInfo list
 Each MarkerIconInfo represents a marker you want to animate on the map, including its position, 
