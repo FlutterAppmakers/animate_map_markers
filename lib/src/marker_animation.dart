@@ -18,8 +18,6 @@ class MarkerAnimationController {
   /// A map of running animation controllers associated with their respective marker IDs.
   final Map<MarkerId, AnimationController> _runningAnimationControllers = {};
 
-  /// A map holding the original (unscaled) icons for each marker.
-  final Map<MarkerId, BitmapDescriptor> _originalIcons = {};
 
   /// Stream controller that broadcasts updates when a marker's icon changes.
   final StreamController<BitmapDescriptor> _iconStreamController =
@@ -166,10 +164,13 @@ class MarkerAnimationController {
   void animateMarker(MarkerId markerId, bool selected) {
     final animationController = _runningAnimationControllers[markerId];
     if (animationController != null) {
+      final status = animationController.status;
       if (selected) {
-        toggleAnimationDirection(animationController);
+        forwardAnimation(animationController);
       } else {
-        reverseAnimation(animationController);
+        if(status == AnimationStatus.completed) {
+          reverseAnimation(animationController);
+        }
       }
     }
   }
@@ -178,14 +179,11 @@ class MarkerAnimationController {
   ///
   /// - If the animation is completed or dismissed, it starts playing forward.
   /// - If the animation is currently playing forward, it reverses the animation.
-  void toggleAnimationDirection(AnimationController animationController)  {
+  void forwardAnimation(AnimationController animationController)  {
     if (animationController.status == AnimationStatus.dismissed ||
         animationController.status == AnimationStatus.completed) {
 
       animationController.forward();
-    }
-   else if (animationController.status == AnimationStatus.forward) {
-      animationController.reverse();
     }
   }
 

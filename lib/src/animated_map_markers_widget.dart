@@ -313,11 +313,11 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
         reverseCurve: markerIconInfo.reverseCurve,
         vsync: this);
 
-    _markerAnimationControllers[markerId] = markerAnimationController;
 
 
       /// Start the animation
       markerAnimationController.setupAnimationController();
+    _markerAnimationControllers[markerId] = markerAnimationController;
     }
 
     void _updateMarker(MarkerAnimationController markerAnimationController, MarkerIconInfo markerIconInfo) {

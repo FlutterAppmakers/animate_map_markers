@@ -77,7 +77,7 @@ class MarkerHelper {
         flat: markerIconInfo.flat,
         rotation: markerIconInfo.rotation,
         visible: markerIconInfo.visible,
-        zIndex: markerIconInfo.zIndex,
+        zIndexInt: markerIconInfo.zIndexInt,
         clusterManagerId: markerIconInfo.clusterManagerId,
         onTap: () {
           markerIconInfo.onTap?.call();
@@ -111,30 +111,12 @@ class MarkerHelper {
   /// [MarkerAnimationController], which must be pre-registered in
   /// [markerAnimationController].
   ///
+
   void selectMarker(MarkerId markerId) {
-    // Store the current selected marker as the previous one
-    _previousSelectedMarkerId = _selectedMarkerId;
-    // Set the newly tapped marker as the current selected one
-    _selectedMarkerId = markerId;
-    // You can now access _previousSelectedMarkerId and _selectedMarkerId
-    print('Previously selected marker: $_previousSelectedMarkerId');
-    print('Currently selected marker: $_selectedMarkerId');
-
-    if (_selectedMarkerId != null) {
-      final controller = markerAnimationControllers[_selectedMarkerId!];
-      if (controller != null) {
-        controller.animateMarker(
-            _selectedMarkerId!, true); /// Pass `true` for selected
-      }
-    }
-
-    if (_previousSelectedMarkerId != null &&
-        _previousSelectedMarkerId != _selectedMarkerId) {
-      final controller = markerAnimationControllers[_previousSelectedMarkerId!];
-      if (controller != null) {
-        controller.animateMarker(
-            _previousSelectedMarkerId!, false); // Pass `false` for deselected
-      }
+    print("markerAnimationControllers length ### ${markerAnimationControllers.length}");
+    for (final entry in markerAnimationControllers.entries) {
+      final isSelected = entry.key == markerId;
+      entry.value.animateMarker(entry.key, isSelected);
     }
   }
 }

@@ -23,7 +23,7 @@ class MarkerIconInfo {
     this.infoWindow = InfoWindow.noText,
     this.rotation = 0.0,
     this.visible = true,
-    this.zIndex = 0.0,
+    this.zIndexInt = 0,
     this.clusterManagerId,
     this.onDrag,
     this.onDragStart,
@@ -112,7 +112,7 @@ class MarkerIconInfo {
   ///
   /// Overlays are drawn in order of z-index, so that lower values means drawn
   /// earlier, and thus appearing to be closer to the surface of the Earth.
-  final double zIndex;
+  final int  zIndexInt;
 
   /// Marker clustering is managed by [ClusterManager] with [clusterManagerId].
   final ClusterManagerId? clusterManagerId;
