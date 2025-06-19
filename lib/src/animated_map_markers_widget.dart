@@ -326,6 +326,7 @@ class _AnimatedMapMarkersWidgetState extends State<AnimatedMapMarkersWidget>
       markerIconInfo, markerHelper);
   if (mapStream != null) {
   _mapStreamSubscription = mapStream!.listen((updatedMarker) {
+    if (!mounted) return; /// Only update if the widget is still active
 
   final markerId = updatedMarker.markerId;
 

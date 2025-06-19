@@ -10,8 +10,8 @@ class MarkerIconInfo {
     required this.position,
     required this.scale,
     required this.assetPath,
-    this.duration = const Duration(milliseconds: 500),
-    this.reverseDuration = const Duration(milliseconds: 500),
+    this.duration = const Duration(milliseconds: 300),
+    this.reverseDuration = const Duration(milliseconds: 300),
     this.curve = Curves.bounceOut,
     this.reverseCurve = Curves.linear,
     // other marker params
@@ -46,12 +46,12 @@ class MarkerIconInfo {
 
   /// The duration of the animation.
   ///
-  /// Defaults to 500 milliseconds.
+  /// Defaults to 300 milliseconds.
   final Duration duration;
 
   /// The reverse duration of the animation.
   ///
-  /// Defaults to 500 milliseconds.
+  /// Defaults to 300 milliseconds.
   final Duration reverseDuration;
 
   /// The curve of the animation.
