@@ -32,7 +32,6 @@ dependencies:
   flutter:
     sdk: flutter
   google_maps_flutter: ^2.12.3
-  flutter_svg: ^2.1.0
   carousel_slider: ^5.0.0
 
 
