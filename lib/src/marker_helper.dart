@@ -80,10 +80,10 @@ class MarkerHelper {
         zIndexInt: markerIconInfo.zIndexInt,
         clusterManagerId: markerIconInfo.clusterManagerId,
         onTap: () {
-          markerIconInfo.onTap?.call();
           if (onMarkerTapped != null) {
             onMarkerTapped!(markerIconInfo.markerId, markerIconInfo.position);
           }
+          markerIconInfo.onTap?.call();
           selectMarker(markerIconInfo.markerId);
         },
         onDrag: markerIconInfo.onDrag,

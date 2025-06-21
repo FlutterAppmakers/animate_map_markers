@@ -25,6 +25,7 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
     this.style,
     this.onMapCreated,
     required this.scaledMarkerIconInfos,
+    this.animateToMarker = true,
     this.overlayContent,
     // other google maps params
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
@@ -242,6 +243,13 @@ class AnimatedMapMarkersWidget extends StatefulWidget {
   /// Called every time a [GoogleMap] is long pressed.
   final ArgumentCallback<LatLng>? onLongPress;
 
+  /// Whether to animate the camera to the marker’s position when a marker is tapped.
+  ///
+  /// If `true`, the map camera will smoothly animate to center on the marker.
+  /// If `false`, the camera remains in its current position.
+  /// Defaults to `true` for a more intuitive user experience.
+  final bool animateToMarker;
+
   @override
   State<AnimatedMapMarkersWidget> createState() =>
       _AnimatedMapMarkersWidgetState();
@@ -362,16 +370,35 @@ void _updateMarkers() {
 
     isPageAnimatingFromMarker.value = true;
 
+
+      _animateToLocation(markerId, position);
+
+
+    _handleOverlayActionForMarker(markerId);
+  }
+
+  /// Handles the overlay UI behavior when a marker is tapped, based on the
+  /// current [overlayContent] configuration.
+  ///
+  /// This function checks the type of [widget.overlayContent] and triggers
+  /// the appropriate UI update:
+  ///
+  /// - If the overlay is a [MarkerDraggableSheetConfig], it triggers the sheet animation.
+  /// - If the overlay is a [MarkerSwipeCardConfig], it navigates the card carousel to the
+  ///   corresponding marker index.
+  /// - For all other configurations, no action is performed.
+
+  void _handleOverlayActionForMarker(MarkerId markerId) {
     switch (widget.overlayContent) {
       case MarkerDraggableSheetConfig():
 
-        /// Trigger the sheet animation
+      /// Trigger the sheet animation
         markerSheetController.animateSheet();
         break;
 
       case MarkerSwipeCardConfig():
 
-        /// jump to Marker swipe card index
+      /// jump to Marker swipe card index
         final index = widget.scaledMarkerIconInfos
             .indexWhere((info) => info.markerId == markerId);
 
@@ -382,9 +409,38 @@ void _updateMarkers() {
         break;
       default:
 
-        /// no action
+      /// no action
         break;
     }
+
+  }
+
+  /// Animates the camera to the given [position] while preserving the current zoom level.
+  ///
+  /// This function retrieves the current zoom level from the map controller, then
+  /// animates the camera to center on the provided [position] with that zoom level.
+  ///
+  /// Typically used when a marker is tapped or a user action requires focusing
+  /// on a specific location on the map.
+  ///
+  /// [position] - The target [LatLng] coordinates to center the camera on.
+
+  void _animateToLocation(MarkerId markerId, LatLng position) {
+    if (!widget.animateToMarker) {
+      return;
+    }
+
+    _mapsControllerCompleter.future.then((controller){
+      controller.getZoomLevel().then((zoom) {
+        final CameraPosition newPosition = CameraPosition(
+            target: position,
+            zoom: zoom
+        );
+        controller.animateCamera(
+            CameraUpdate.newCameraPosition(newPosition),
+        );
+      });
+    });
   }
 
   /// Animates the carousel to the given page index using behavior
